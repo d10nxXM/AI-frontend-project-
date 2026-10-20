@@ -98,8 +98,13 @@ export function SlotsByDay({
     return <p className="text-muted-foreground">No free time slots in the next two weeks.</p>
   }
 
-  // Until the user picks a day, show the first one that still has a free slot.
-  const day = days.find((d) => d.date === selectedDate) ?? days.find((d) => d.freeCount > 0) ?? days[0]
+  // Until the user picks a day, show the day of the slot they already hold (when moving a
+  // booking), otherwise the first day that still has a free slot.
+  const day =
+    days.find((d) => d.date === selectedDate) ??
+    days.find((d) => d.slots.some((s) => s.id === currentId)) ??
+    days.find((d) => d.freeCount > 0) ??
+    days[0]
 
   return (
     <div className="flex flex-col gap-4">

@@ -14,7 +14,7 @@ export function BusinessesList({ filter }: BusinessesListProps) {
 
   if (isLoading) {
     return (
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {Array.from({ length: 3 }, (_, i) => (
           <Skeleton key={i} className="h-24 sm:h-80" />
         ))}
@@ -31,7 +31,7 @@ export function BusinessesList({ filter }: BusinessesListProps) {
   }
 
   return (
-    <ul className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+    <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
       {businesses.map((business) => (
         <li key={business.id}>
           <BusinessCard business={business} />

@@ -42,7 +42,7 @@ export function BusinessCard({ business }: BusinessCardProps) {
           <h2 className="truncate text-base font-semibold sm:text-lg">{business.name}</h2>
           <p className="hidden text-sm text-muted-foreground sm:line-clamp-2">{business.description}</p>
           <div className="mt-auto flex flex-col gap-1 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2">
+            <span className="flex min-w-0 items-center gap-2">
               <MapPin aria-hidden className="size-4 shrink-0" />
               <span className="truncate">
                 {business.address}, {business.city}
