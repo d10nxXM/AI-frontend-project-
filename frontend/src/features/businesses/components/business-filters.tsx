@@ -6,9 +6,12 @@ import { ChipGroup } from './chip-group'
 type BusinessFiltersProps = {
   filter: BusinessFilter
   onChange: (filter: BusinessFilter) => void
+  // "Free today" is decided by the slots feature; the filter only shows the choice.
+  freeToday?: boolean
+  onFreeTodayChange?: (freeToday: boolean) => void
 }
 
-export function BusinessFilters({ filter, onChange }: BusinessFiltersProps) {
+export function BusinessFilters({ filter, onChange, freeToday, onFreeTodayChange }: BusinessFiltersProps) {
   // Cities come from the unfiltered list so every city stays selectable.
   const { data: all } = useBusinesses({})
   const cities = [...new Set(all?.map((b) => b.city))].sort()
@@ -27,6 +30,14 @@ export function BusinessFilters({ filter, onChange }: BusinessFiltersProps) {
           options={cities.map((c) => ({ value: c, label: c }))}
           value={filter.city}
           onChange={(city) => onChange({ ...filter, city })}
+        />
+      )}
+      {onFreeTodayChange && (
+        <ChipGroup
+          label="When"
+          options={[{ value: 'today', label: 'Free today' }]}
+          value={freeToday ? 'today' : undefined}
+          onChange={(value) => onFreeTodayChange(value === 'today')}
         />
       )}
     </div>

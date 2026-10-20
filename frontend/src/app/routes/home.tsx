@@ -5,6 +5,7 @@ import { NextBooking } from '@/features/bookings/components/next-booking'
 import { BusinessSearchForm } from '@/features/businesses/components/business-search-form'
 import { BusinessesList } from '@/features/businesses/components/businesses-list'
 import { CategoryLinks } from '@/features/businesses/components/category-links'
+import { NextFreeTime } from '@/features/slots/components/next-free-time'
 
 // Search first (the one main action), then the next booking, categories and a few businesses.
 export function Home() {
@@ -46,7 +47,11 @@ export function Home() {
             <ArrowRight aria-hidden className="size-4" />
           </Link>
         </div>
-        <BusinessesList filter={{}} limit={3} />
+        <BusinessesList
+          filter={{}}
+          limit={3}
+          renderExtra={(business) => <NextFreeTime businessId={business.id} />}
+        />
       </section>
     </div>
   )
