@@ -31,7 +31,8 @@ export function BookingCard({ booking, past, onCancel, isCancelling }: BookingCa
     <Card className="flex h-full flex-row gap-4 overflow-hidden rounded-lg p-4 shadow-none sm:flex-col sm:gap-0 sm:p-0">
       <img
         src={booking.imageUrl}
-        alt={booking.businessName}
+        // Decorative: the business name is written right next to it.
+        alt=""
         className="size-16 shrink-0 rounded-md bg-muted object-cover sm:aspect-video sm:size-auto sm:w-full sm:rounded-none"
       />
       <div className="flex min-w-0 flex-1 flex-col gap-2 sm:p-4">
@@ -51,13 +52,13 @@ export function BookingCard({ booking, past, onCancel, isCancelling }: BookingCa
           </Link>
         </h3>
         {/* The time is what matters most on a booking, so it is the strongest line. */}
-        {/* Date-time and duration each stay on one line; only the whole duration may wrap. */}
-        <span className="flex flex-wrap items-center gap-x-2 text-base font-semibold tabular-nums">
-          <CalendarClock aria-hidden className="size-4 shrink-0 text-muted-foreground" />
-          <span className="whitespace-nowrap">{formatStartsAt(booking.startsAt)}</span>
-          <span className="font-normal whitespace-nowrap text-muted-foreground">
-            · {booking.durationMinutes} min
+        {/* The time is the strongest line; the duration sits under it instead of wrapping. */}
+        <span className="flex flex-col">
+          <span className="flex items-center gap-2 text-base font-semibold whitespace-nowrap tabular-nums">
+            <CalendarClock aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+            {formatStartsAt(booking.startsAt)}
           </span>
+          <span className="pl-6 text-sm text-muted-foreground tabular-nums">{booking.durationMinutes} min</span>
         </span>
         <span className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin aria-hidden className="size-4 shrink-0" />

@@ -26,7 +26,7 @@ Open the repo root in VS Code and start the Claude Code extension.
 ```
 frontend/         React app (this workshop)
   src/app/        router.tsx, providers.tsx and routes/ (one file per route)
-  src/features/   one folder per feature: api/, components/, types.ts (example: listings)
+  src/features/   one folder per feature: api/, components/, types.ts (e.g. businesses, bookings, reviews)
   src/components/ ui/ (shadcn) and layout/
   src/lib/        utils.ts and mock-db.ts
 backend/          API, database and auth (next workshop)
@@ -45,7 +45,7 @@ Talking to Claude in any language is fine.
 
 1. "Interview me about our app's design, one question at a time, then fill in frontend/DESIGN.md and update the tokens in frontend/src/index.css."
 2. Fill in the first sentence of CLAUDE.md with your app's topic.
-3. `/new-feature <name>: <description>` for each feature of your app, then delete the `frontend/src/features/listings` example.
+3. `/new-feature <name>: <description>` for each feature of your app (`frontend/src/features/reviews` is a complete example to follow).
 4. `/new-page` for each screen: home, list, detail, form, sign-in.
 5. `/check` and the `ui-reviewer` agent before every commit.
 

@@ -1,5 +1,6 @@
 import { useId } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { localNow } from '@/lib/local-time'
 
@@ -10,10 +11,11 @@ import { BookingCard } from './booking-card'
 type BookingsListProps = {
   search: string
   onCancelled?: (booking: Booking) => void
+  onClearSearch?: () => void
 }
 
 // Upcoming bookings first, then past and cancelled ones; with loading, empty and error states.
-export function BookingsList({ search, onCancelled }: BookingsListProps) {
+export function BookingsList({ search, onCancelled, onClearSearch }: BookingsListProps) {
   const { data: bookings, isLoading, error } = useBookings(search)
   const cancelBooking = useCancelBooking()
   // Sections are named by their headings, so screen readers list them as regions.
@@ -36,9 +38,16 @@ export function BookingsList({ search, onCancelled }: BookingsListProps) {
 
   if (!bookings || bookings.length === 0) {
     return (
-      <p className="mt-8 text-muted-foreground">
-        {search ? `No bookings match "${search}".` : 'You have no bookings yet.'}
-      </p>
+      <div className="mt-8 flex flex-col items-start gap-4">
+        <p className="text-muted-foreground">
+          {search ? `No bookings match "${search}".` : 'You have no bookings yet.'}
+        </p>
+        {search && onClearSearch && (
+          <Button variant="outline" onClick={onClearSearch}>
+            Clear search
+          </Button>
+        )}
+      </div>
     )
   }
 

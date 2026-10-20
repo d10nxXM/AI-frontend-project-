@@ -5,27 +5,6 @@
 > The entity type lives in `frontend/src/features/<name>/types.ts` and the mock API in
 > `frontend/src/features/<name>/api/<name>-api.ts`.
 
-## Listing (example, replace with your own)
-
-Code: `frontend/src/features/listings/` (`types.ts`, `api/listings-api.ts`, `api/use-listings.ts`).
-
-| Field | Type | Required | Notes |
-| --- | --- | --- | --- |
-| id | number | yes | assigned by the backend |
-| title | string, 3–80 characters | yes | |
-| description | string | no | |
-| price | number ≥ 0, EUR | yes | |
-| category | `games` \| `consoles` \| `accessories` | yes | |
-| city | string | yes | |
-| imageUrl | URL | no | |
-| createdAt | date | yes | assigned by the backend |
-
-**Relations:** a listing belongs to one user (the seller).
-
-**Access rules:** everyone can see listings; only a signed-in user can create one; only the author can edit or delete their listing.
-
-**API the frontend expects:** `GET /listings?search=`, `GET /listings/:id`, `POST /listings`, `PATCH /listings/:id`, `DELETE /listings/:id`.
-
 ## Booking
 
 Code: `frontend/src/features/bookings/` (`types.ts`, `api/bookings-api.ts`, `api/use-bookings.ts`).
@@ -196,7 +175,7 @@ convenience; anyone can call the API directly, so the server repeats every rule.
   `GET /slots` and `GET /businesses`.
 - **Public slots carry no private data:** slot responses contain only `TimeSlot` fields, never booking or
   client data.
-- **Fewer requests for listings:** return a computed `nextFreeAt` on each business in `GET /businesses` and
+- **Fewer requests for business lists:** return a computed `nextFreeAt` on each business in `GET /businesses` and
   support `GET /businesses?available=today`, instead of the frontend asking for slots once per card.
 - **Favorites (when synced to an account):** routes are `GET /me/favorites`, `PUT /me/favorites/:businessId` and
   `DELETE /me/favorites/:businessId`; the user comes only from the session, never from a `userId` in the path,
