@@ -1,12 +1,14 @@
 import { ArrowLeft } from 'lucide-react'
 import { useCallback, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 
 import { NotFound } from '@/app/routes/not-found'
 import { BookingSummary } from '@/features/bookings/components/booking-summary'
 import { ClientDetailsForm } from '@/features/bookings/components/client-details-form'
 import type { Booking, ClientDetails } from '@/features/bookings/types'
 import { BusinessDetail as BusinessInfo } from '@/features/businesses/components/business-detail'
+import { RatingSummary } from '@/features/reviews/components/rating-summary'
+import { ReviewsList } from '@/features/reviews/components/reviews-list'
 import { ServicesList } from '@/features/services/components/services-list'
 import type { Service } from '@/features/services/types'
 import { useBookRange } from '@/features/slots/api/use-slots'
@@ -16,6 +18,10 @@ import type { TimeSlot } from '@/features/slots/types'
 // Booking flow on the business page: 1. service, 2. time slot, 3. your details, 4. confirm.
 export function BusinessDetail() {
   const id = Number(useParams().id)
+  // "Book again" links here with ?service=<id> to choose that service for the client.
+  // Digits only, so spellings like 1e2 or 0x4 are ignored too.
+  const serviceParam = useSearchParams()[0].get('service') ?? ''
+  const preselectId = /^[1-9]\d{0,9}$/.test(serviceParam) ? Number(serviceParam) : undefined
   const navigate = useNavigate()
   const bookRange = useBookRange()
   const [service, setService] = useState<Service>()
@@ -52,12 +58,17 @@ export function BusinessDetail() {
         All businesses
       </Link>
 
-      <BusinessInfo id={id}>
+      <BusinessInfo id={id} summary={(business) => <RatingSummary businessId={business.id} />}>
         {(business) => (
           <div className="flex min-w-0 flex-col gap-8">
             <div className="flex flex-col gap-4">
               <h2 className="text-xl font-semibold">1. Choose a service</h2>
-              <ServicesList businessId={id} selectedId={service?.id} onSelect={chooseService} />
+              <ServicesList
+                businessId={id}
+                selectedId={service?.id}
+                onSelect={chooseService}
+                preselectId={preselectId}
+              />
             </div>
 
             <div className="flex flex-col gap-4">
@@ -89,6 +100,13 @@ export function BusinessDetail() {
                 onBooked={handleBooked}
               />
             </div>
+
+            <section aria-labelledby="business-reviews" className="flex flex-col gap-4">
+              <h2 id="business-reviews" className="text-xl font-semibold">
+                Reviews
+              </h2>
+              <ReviewsList businessId={business.id} />
+            </section>
           </div>
         )}
       </BusinessInfo>

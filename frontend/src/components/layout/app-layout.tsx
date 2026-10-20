@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet } from 'react-router'
 
+import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 
 const links = [
@@ -23,24 +24,27 @@ export function AppLayout() {
           >
             Zakazi.me
           </Link>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-            {links.map((link) => (
-              <li key={link.to}>
-                <NavLink
-                  to={link.to}
-                  end={link.to === '/'}
-                  className={({ isActive }) =>
-                    cn(
-                      'rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring',
-                      isActive && 'font-semibold text-foreground',
-                    )
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+          <div className="flex items-center justify-between gap-6">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {links.map((link) => (
+                <li key={link.to}>
+                  <NavLink
+                    to={link.to}
+                    end={link.to === '/'}
+                    className={({ isActive }) =>
+                      cn(
+                        'rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring',
+                        isActive && 'font-semibold text-foreground',
+                      )
+                    }
+                  >
+                    {link.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+            <ThemeToggle />
+          </div>
         </nav>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8">

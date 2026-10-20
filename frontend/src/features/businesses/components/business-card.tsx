@@ -8,6 +8,7 @@ import { categoryIcons } from '@/lib/categories'
 
 import type { Business } from '../types'
 import { categoryLabels } from './category-meta'
+import { FavoriteButton } from './favorite-button'
 
 type BusinessCardProps = {
   business: Business
@@ -16,15 +17,14 @@ type BusinessCardProps = {
 }
 
 // Mobile: a row with a 64 px square photo. From sm up: a card with a 16:9 cover (DESIGN.md).
+// The name is the link and stretches over the whole card (after:inset-0), so the heart can be
+// its own button: a button inside a link is invalid and confuses keyboards and screen readers.
 export function BusinessCard({ business, extra }: BusinessCardProps) {
   const Icon = categoryIcons[business.category]
 
   return (
-    <Link
-      to={`/businesses/${business.id}`}
-      className="block h-full rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring"
-    >
-      <Card className="flex h-full flex-row gap-4 overflow-hidden rounded-lg p-4 shadow-none transition-colors hover:border-foreground/30 sm:flex-col sm:gap-0 sm:p-0">
+    <div className="group relative h-full rounded-lg has-[a:focus-visible]:ring-3 has-[a:focus-visible]:ring-ring">
+      <Card className="flex h-full flex-row gap-4 overflow-hidden rounded-lg p-4 shadow-none transition-colors group-hover:border-foreground/30 sm:flex-col sm:gap-0 sm:p-0">
         {business.imageUrl ? (
           <img
             src={business.imageUrl}
@@ -42,7 +42,11 @@ export function BusinessCard({ business, extra }: BusinessCardProps) {
             <Icon aria-hidden />
             {categoryLabels[business.category]}
           </Badge>
-          <h2 className="truncate text-base font-semibold sm:text-lg">{business.name}</h2>
+          <h2 className="truncate pr-10 text-base font-semibold sm:pr-0 sm:text-lg">
+            <Link to={`/businesses/${business.id}`} className="outline-none after:absolute after:inset-0">
+              {business.name}
+            </Link>
+          </h2>
           <p className="hidden text-sm text-muted-foreground sm:line-clamp-2">{business.description}</p>
           <div className="mt-auto flex flex-col gap-1 text-sm text-muted-foreground">
             <span className="flex min-w-0 items-start gap-2">
@@ -60,6 +64,8 @@ export function BusinessCard({ business, extra }: BusinessCardProps) {
           </div>
         </div>
       </Card>
-    </Link>
+      {/* Above the stretched link, so it gets its own clicks. */}
+      <FavoriteButton business={business} className="absolute top-2 right-2 z-10" />
+    </div>
   )
 }

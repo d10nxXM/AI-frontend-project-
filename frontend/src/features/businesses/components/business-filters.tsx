@@ -9,9 +9,18 @@ type BusinessFiltersProps = {
   // "Free today" is decided by the slots feature; the filter only shows the choice.
   freeToday?: boolean
   onFreeTodayChange?: (freeToday: boolean) => void
+  favoritesOnly?: boolean
+  onFavoritesOnlyChange?: (favoritesOnly: boolean) => void
 }
 
-export function BusinessFilters({ filter, onChange, freeToday, onFreeTodayChange }: BusinessFiltersProps) {
+export function BusinessFilters({
+  filter,
+  onChange,
+  freeToday,
+  onFreeTodayChange,
+  favoritesOnly,
+  onFavoritesOnlyChange,
+}: BusinessFiltersProps) {
   // Cities come from the unfiltered list so every city stays selectable.
   const { data: all } = useBusinesses({})
   const cities = [...new Set(all?.map((b) => b.city))].sort()
@@ -38,6 +47,14 @@ export function BusinessFilters({ filter, onChange, freeToday, onFreeTodayChange
           options={[{ value: 'today', label: 'Free today' }]}
           value={freeToday ? 'today' : undefined}
           onChange={(value) => onFreeTodayChange(value === 'today')}
+        />
+      )}
+      {onFavoritesOnlyChange && (
+        <ChipGroup
+          label="Show"
+          options={[{ value: 'favorites', label: 'Favorites' }]}
+          value={favoritesOnly ? 'favorites' : undefined}
+          onChange={(value) => onFavoritesOnlyChange(value === 'favorites')}
         />
       )}
     </div>

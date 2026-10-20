@@ -10,15 +10,18 @@ import { NotFoundError } from '@/lib/mock-db'
 import { useBusiness } from '../api/use-businesses'
 import type { Business } from '../types'
 import { categoryLabels } from './category-meta'
+import { FavoriteButton } from './favorite-button'
 
 type BusinessDetailProps = {
   id: number
   // Shown next to the info (below it on phones), only once the business has loaded.
   children?: (business: Business) => ReactNode
+  // A line under the name from another feature (e.g. the rating).
+  summary?: (business: Business) => ReactNode
 }
 
 // Cover photo, name and the practical info, with loading, not-found and error states.
-export function BusinessDetail({ id, children }: BusinessDetailProps) {
+export function BusinessDetail({ id, children, summary }: BusinessDetailProps) {
   const { data: business, isLoading, error } = useBusiness(id)
 
   if (isLoading) {
@@ -62,7 +65,11 @@ export function BusinessDetail({ id, children }: BusinessDetailProps) {
             <Icon aria-hidden />
             {categoryLabels[business.category]}
           </Badge>
-          <h1 className="text-3xl font-bold text-balance">{business.name}</h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-3xl font-bold text-balance">{business.name}</h1>
+            <FavoriteButton business={business} className="shrink-0" />
+          </div>
+          {summary?.(business)}
           <p className="text-muted-foreground">{business.description}</p>
         </div>
 

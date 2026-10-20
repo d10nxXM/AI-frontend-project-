@@ -139,6 +139,38 @@ A time window a business publishes; a client books a free one. The mock generate
 
 **API the frontend expects:** `GET /slots?businessId=&date=&status=`, `GET /slots/:id`, `POST /slots`, `PATCH /slots/:id`, `DELETE /slots/:id`.
 
+## Review
+
+Code: `frontend/src/features/reviews/` (`types.ts`, `api/reviews-api.ts`, `api/use-reviews.ts`, `components/`).
+Shown on the business page (average under the name and a "Reviews" list), as a short rating line on business
+cards, and as "Rate your visit" on a past booking.
+
+A client's rating of a business after a past visit.
+
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| id | number | yes | assigned by the backend |
+| businessId | number | yes | taken from the booking by the backend |
+| bookingId | number | yes | the past booking being rated; one review per booking |
+| rating | whole number 1–5 | yes | |
+| comment | string, at most 500 characters | no | trimmed; an empty comment is stored as none; shown publicly |
+| authorName | string | yes | first name + initial of the client, e.g. `Milena V.`; set by the backend, never the full name or phone |
+| createdAt | date | yes | assigned by the backend |
+
+**Relations:** a review belongs to one booking (and through it to one client and one business); a business has many reviews.
+
+**Access rules:** everyone can read reviews; only the client of a booking can review it, only once, and only when the booking is in the past and not cancelled; only the author can change or delete their review; the business owner can read reviews of their business but not change or delete them (they get "report" and "reply" instead); the owner and staff of a business cannot review it.
+
+**API the frontend expects:** `GET /reviews?businessId=` (required, paginated, newest first), `GET /reviews/:id`, `POST /reviews` (`{ bookingId, rating, comment? }`), `PATCH /reviews/:id` (`{ rating?, comment? }`), `DELETE /reviews/:id`. The client's own review of a booking comes from a session-scoped endpoint (`GET /me/reviews?bookingId=` or a `myReview` field on `GET /bookings/:id`), not from the public list. The mock sends `businessId` and `clientName` and filters by `bookingId` in the browser; the real API does not.
+
+**Backend rules for reviews (from the security review):**
+- `POST /reviews` takes only `{ bookingId, rating, comment? }`. The server loads the booking and checks that it belongs to the session user, ended before the server's current time, is not cancelled (ideally attended, not a no-show), has no review yet (a unique database constraint on `bookingId`, not just a check first) and that the user is not the business's owner or staff. `businessId` comes from the booking.
+- `rating` is a whole number 1–5; `comment` is trimmed, at most 500 characters, and follows the control-character and output-encoding rules below.
+- `authorName` comes from the account profile, not from the free-text booking name, and the user can preview it or choose "Anonymous client"; reject values that look like a phone number or e-mail. Public review responses never include the full name, phone or `bookingId`.
+- Rate-limit creating reviews per user and per IP; decide an edit window and mark edited reviews; add a report/moderation flow for comments.
+- Compute the average and count on the server: return `ratingAverage` and `reviewCount` on `GET /businesses` instead of the frontend loading all reviews for the cards.
+- On account deletion, delete or anonymise ("Former client") the user's reviews, and include them in the data export.
+
 ## Security requirements for the backend
 
 From the security reviews of the client features. The frontend validation (zod) is only for the user's
@@ -152,6 +184,11 @@ convenience; anyone can call the API directly, so the server repeats every rule.
   a line break or control character can inject content.
 - **Encode text for each output:** escape `note` and other free text for every place it leaves the React UI
   (HTML e-mail, SMS, `.ics`); in CSV exports prefix values starting with `= + - @` so they are not formulas.
+- **One business per booking:** `POST /bookings` and `PATCH /bookings/:id` reject the request unless the slot
+  and the service belong to the same business (`slot.businessId === service.businessId`) and every slot the
+  duration covers is free and belongs to that business. `GET /services?businessId=` always applies the filter.
+  The frontend's "Book again" link (`/businesses/:id?service=:serviceId`) only preselects a service the
+  business offers, but anyone can call the API directly.
 - **Times:** `startsAt` is always `YYYY-MM-DDTHH:mm` and `durationMinutes` a positive whole number; reject
   anything else.
 - **Abuse limits:** only signed-in users create bookings; rate-limit `POST /bookings` per user and per IP;
@@ -161,5 +198,20 @@ convenience; anyone can call the API directly, so the server repeats every rule.
   client data.
 - **Fewer requests for listings:** return a computed `nextFreeAt` on each business in `GET /businesses` and
   support `GET /businesses?available=today`, instead of the frontend asking for slots once per card.
+- **Favorites (when synced to an account):** routes are `GET /me/favorites`, `PUT /me/favorites/:businessId` and
+  `DELETE /me/favorites/:businessId`; the user comes only from the session, never from a `userId` in the path,
+  query or body. `businessId` must be a positive integer of an existing business; adding and removing are
+  idempotent; at most 100 per user (the same cap as the frontend). On first sign-in the browser's
+  `zakazi.favorites` list is merged on the server with the same checks, never trusted as-is. Favorites are
+  private: never returned on public business endpoints or shown to business owners. Mutations need CSRF
+  protection (or same-site cookies) and a per-user rate limit. Favorites are deleted with the account and
+  included in the user's data export. Today they live only in the browser (no consent box needed: only
+  public business ids, saved on an explicit tap).
+- **No framing:** serve the app with `Content-Security-Policy: frame-ancestors 'none'` (or
+  `X-Frame-Options: DENY`), so another site cannot overlay it and trick a click on a heart, "Book" or "Cancel".
+- **Content-Security-Policy:** `default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com; img-src 'self' data: <cover image hosts>; connect-src 'self' <api>;
+  frame-ancestors 'none'; base-uri 'self'; object-src 'none'`. The frontend has no inline scripts (the theme is set
+  by `public/theme-init.js`), so `script-src 'self'` needs no hash or nonce; check the built CSS needs no inline styles.
 - **Secrets:** only in environment variables; `.env` files are git-ignored (only `.env.example` is
   committed). `VITE_*` variables are public, because they are bundled into the browser code.

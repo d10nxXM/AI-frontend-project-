@@ -13,6 +13,7 @@ import { NotFoundError } from '@/lib/mock-db'
 import { useBooking, useCancelBooking } from '../api/use-bookings'
 import type { Booking } from '../types'
 import { AddToCalendarButton } from './add-to-calendar-button'
+import { BookAgainLink } from './book-again-link'
 import { CancelBookingButton } from './cancel-booking-button'
 import { formatStartsAt } from './format-starts-at'
 
@@ -32,10 +33,12 @@ type BookingDetailProps = {
   onCancelled?: (booking: Booking) => void
   // Extra actions for an upcoming booking (e.g. moving it), rendered next to the details.
   children?: (booking: Booking) => ReactNode
+  // Shown under the details of a past (not cancelled) booking, e.g. a review form.
+  pastActions?: (booking: Booking) => ReactNode
 }
 
 // One booking with loading, not-found and error states; an upcoming one can be cancelled.
-export function BookingDetail({ id, onCancelled, children }: BookingDetailProps) {
+export function BookingDetail({ id, onCancelled, children, pastActions }: BookingDetailProps) {
   const { data: booking, isLoading, error } = useBooking(id)
   const cancelBooking = useCancelBooking()
 
@@ -125,7 +128,7 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-4">
           <span className="text-2xl font-semibold tabular-nums">€{booking.price}</span>
-          {upcoming && (
+          {upcoming ? (
             <div className="flex flex-wrap gap-2">
               <AddToCalendarButton booking={booking} />
               <CancelBookingButton
@@ -136,6 +139,8 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
                 }
               />
             </div>
+          ) : (
+            <BookAgainLink booking={booking} />
           )}
         </div>
         {cancelBooking.isError && (
@@ -143,15 +148,10 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
             The booking could not be cancelled. Please try again.
           </p>
         )}
+        {!upcoming && !cancelled && pastActions?.(booking)}
         {cancelled && (
           <p role="status" className="text-sm">
-            This booking is cancelled.{' '}
-            <Link
-              to={`/businesses/${booking.businessId}`}
-              className="rounded-sm font-medium text-foreground underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-ring"
-            >
-              Book again at {booking.businessName}
-            </Link>
+            This booking is cancelled.
           </p>
         )}
       </article>

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card'
 import { categoryIcons } from '@/lib/categories'
 
 import type { Booking } from '../types'
+import { BookAgainLink } from './book-again-link'
 import { CancelBookingButton } from './cancel-booking-button'
 import { formatStartsAt } from './format-starts-at'
 
@@ -64,12 +65,14 @@ export function BookingCard({ booking, past, onCancel, isCancelling }: BookingCa
         </span>
         <div className="mt-auto flex items-center justify-between gap-4 pt-2">
           <span className="font-semibold tabular-nums sm:text-lg">€{booking.price}</span>
-          {active && (
+          {active ? (
             <CancelBookingButton
               booking={booking}
               pending={isCancelling}
               onConfirm={() => onCancel(booking)}
             />
+          ) : (
+            <BookAgainLink booking={booking} />
           )}
         </div>
       </div>
