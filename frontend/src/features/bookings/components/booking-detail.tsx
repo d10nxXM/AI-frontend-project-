@@ -3,6 +3,7 @@ import { CalendarClock, MapPin } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 
+import { DirectionsLink } from '@/components/directions-link'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { categoryIcons } from '@/lib/categories'
@@ -11,6 +12,7 @@ import { NotFoundError } from '@/lib/mock-db'
 
 import { useBooking, useCancelBooking } from '../api/use-bookings'
 import type { Booking } from '../types'
+import { AddToCalendarButton } from './add-to-calendar-button'
 import { CancelBookingButton } from './cancel-booking-button'
 import { formatStartsAt } from './format-starts-at'
 
@@ -98,20 +100,42 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
             <dt>
               <MapPin aria-label="Address" className="size-4 text-muted-foreground" />
             </dt>
-            <dd>
-              {booking.address}, {booking.city}
+            <dd className="flex flex-wrap items-center gap-x-2">
+              <span>
+                {booking.address}, {booking.city}
+              </span>
+              <DirectionsLink address={booking.address} city={booking.city} />
             </dd>
           </div>
         </dl>
 
-        <div className="flex items-center justify-between gap-4 border-t pt-4">
+        <section aria-labelledby={`booked-for-${booking.id}`} className="flex flex-col gap-1 text-sm">
+          <h2 id={`booked-for-${booking.id}`} className="font-medium text-muted-foreground">
+            Booked for
+          </h2>
+          <p className="font-medium">{booking.clientName}</p>
+          <a
+            href={`tel:${booking.clientPhone.replace(/ /g, '')}`}
+            className="w-fit rounded-sm tabular-nums underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring"
+          >
+            {booking.clientPhone}
+          </a>
+          {booking.note && <p className="text-muted-foreground">“{booking.note}”</p>}
+        </section>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-4">
           <span className="text-2xl font-semibold tabular-nums">€{booking.price}</span>
           {upcoming && (
-            <CancelBookingButton
-              booking={booking}
-              pending={cancelBooking.isPending}
-              onConfirm={() => cancelBooking.mutate(booking.id, { onSuccess: () => onCancelled?.(booking) })}
-            />
+            <div className="flex flex-wrap gap-2">
+              <AddToCalendarButton booking={booking} />
+              <CancelBookingButton
+                booking={booking}
+                pending={cancelBooking.isPending}
+                onConfirm={() =>
+                  cancelBooking.mutate(booking.id, { onSuccess: () => onCancelled?.(booking) })
+                }
+              />
+            </div>
           )}
         </div>
         {cancelBooking.isError && (

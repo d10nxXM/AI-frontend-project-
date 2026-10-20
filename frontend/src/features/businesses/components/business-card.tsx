@@ -1,4 +1,5 @@
 import { Clock, MapPin } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 
 import { Badge } from '@/components/ui/badge'
@@ -10,10 +11,12 @@ import { categoryLabels } from './category-meta'
 
 type BusinessCardProps = {
   business: Business
+  // Extra line from another feature (e.g. the next free time), placed under the opening hours.
+  extra?: ReactNode
 }
 
 // Mobile: a row with a 64 px square photo. From sm up: a card with a 16:9 cover (DESIGN.md).
-export function BusinessCard({ business }: BusinessCardProps) {
+export function BusinessCard({ business, extra }: BusinessCardProps) {
   const Icon = categoryIcons[business.category]
 
   return (
@@ -43,9 +46,9 @@ export function BusinessCard({ business }: BusinessCardProps) {
           <p className="hidden text-sm text-muted-foreground sm:line-clamp-2">{business.description}</p>
           <div className="mt-auto flex flex-col gap-1 text-sm text-muted-foreground">
             <span className="flex min-w-0 items-start gap-2">
-            <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {/* Wraps instead of truncating, so the city at the end stays visible. */}
-            <span className="line-clamp-2">
+              <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />
+              {/* Wraps instead of truncating, so the city at the end stays visible. */}
+              <span className="line-clamp-2">
                 {business.address}, {business.city}
               </span>
             </span>
@@ -53,6 +56,7 @@ export function BusinessCard({ business }: BusinessCardProps) {
               <Clock aria-hidden className="size-4 shrink-0" />
               {business.openingHours}
             </span>
+            {extra}
           </div>
         </div>
       </Card>

@@ -19,6 +19,9 @@ let bookings: Booking[] = [
     durationMinutes: 60,
     status: 'booked',
     imageUrl: 'https://picsum.photos/seed/zakazi-lana/600/338',
+    clientName: 'Milena Vukovic',
+    clientPhone: '+382 67 123 456',
+    note: 'First visit, shoulder-length hair.',
     createdAt: '2026-10-15',
   },
   {
@@ -37,6 +40,8 @@ let bookings: Booking[] = [
     durationMinutes: 60,
     status: 'booked',
     imageUrl: 'https://picsum.photos/seed/zakazi-iron/600/338',
+    clientName: 'Milena Vukovic',
+    clientPhone: '+382 67 123 456',
     createdAt: '2026-10-14',
   },
   {
@@ -55,6 +60,9 @@ let bookings: Booking[] = [
     durationMinutes: 45,
     status: 'booked',
     imageUrl: 'https://picsum.photos/seed/zakazi-delta/600/338',
+    clientName: 'Milena Vukovic',
+    clientPhone: '+382 67 123 456',
+    note: 'Toyota Yaris 2017, oil change is due.',
     createdAt: '2026-10-12',
   },
   {
@@ -73,6 +81,8 @@ let bookings: Booking[] = [
     durationMinutes: 40,
     status: 'cancelled',
     imageUrl: 'https://picsum.photos/seed/zakazi-kruna/600/338',
+    clientName: 'Milena Vukovic',
+    clientPhone: '+382 67 123 456',
     createdAt: '2026-10-10',
   },
 ]

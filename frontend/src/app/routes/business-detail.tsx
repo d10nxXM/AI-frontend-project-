@@ -1,10 +1,11 @@
 import { ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 
 import { NotFound } from '@/app/routes/not-found'
 import { BookingSummary } from '@/features/bookings/components/booking-summary'
-import type { Booking } from '@/features/bookings/types'
+import { ClientDetailsForm } from '@/features/bookings/components/client-details-form'
+import type { Booking, ClientDetails } from '@/features/bookings/types'
 import { BusinessDetail as BusinessInfo } from '@/features/businesses/components/business-detail'
 import { ServicesList } from '@/features/services/components/services-list'
 import type { Service } from '@/features/services/types'
@@ -12,13 +13,20 @@ import { useBookRange } from '@/features/slots/api/use-slots'
 import { SlotsByDay } from '@/features/slots/components/slots-by-day'
 import type { TimeSlot } from '@/features/slots/types'
 
-// Booking flow on the business page: 1. service, 2. time slot, 3. confirm.
+// Booking flow on the business page: 1. service, 2. time slot, 3. your details, 4. confirm.
 export function BusinessDetail() {
   const id = Number(useParams().id)
   const navigate = useNavigate()
   const bookRange = useBookRange()
   const [service, setService] = useState<Service>()
   const [slot, setSlot] = useState<TimeSlot>()
+  const [client, setClient] = useState<ClientDetails>()
+  const [remember, setRemember] = useState(false)
+  // Stable, because the form reports through it on every change.
+  const changeClient = useCallback((details: ClientDetails | undefined, rememberDetails: boolean) => {
+    setClient(details)
+    setRemember(rememberDetails)
+  }, [])
 
   if (!Number.isInteger(id) || id <= 0) return <NotFound />
 
@@ -65,11 +73,18 @@ export function BusinessDetail() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <h2 className="text-xl font-semibold">3. Confirm</h2>
+              <h2 className="text-xl font-semibold">3. Your details</h2>
+              <ClientDetailsForm onChange={changeClient} />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xl font-semibold">4. Confirm</h2>
               <BookingSummary
                 business={business}
                 service={service}
                 slot={slot}
+                client={client}
+                remember={remember}
                 finishing={bookRange.isPending}
                 onBooked={handleBooked}
               />
