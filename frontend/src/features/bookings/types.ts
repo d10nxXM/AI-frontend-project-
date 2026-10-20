@@ -19,8 +19,14 @@ export type Booking = {
   durationMinutes: number
   status: BookingStatus
   imageUrl: string
+  // Who the booking is for; the business sees these.
+  clientName: string
+  clientPhone: string
+  note?: string
   createdAt: string
 }
+
+export type ClientDetails = Pick<Booking, 'clientName' | 'clientPhone' | 'note'>
 
 export type NewBooking = Omit<Booking, 'id' | 'status' | 'createdAt'>
 

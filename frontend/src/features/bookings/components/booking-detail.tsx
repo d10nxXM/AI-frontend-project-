@@ -104,6 +104,20 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
           </div>
         </dl>
 
+        <section aria-labelledby={`booked-for-${booking.id}`} className="flex flex-col gap-1 text-sm">
+          <h2 id={`booked-for-${booking.id}`} className="font-medium text-muted-foreground">
+            Booked for
+          </h2>
+          <p className="font-medium">{booking.clientName}</p>
+          <a
+            href={`tel:${booking.clientPhone.replace(/ /g, '')}`}
+            className="w-fit rounded-sm tabular-nums underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring"
+          >
+            {booking.clientPhone}
+          </a>
+          {booking.note && <p className="text-muted-foreground">“{booking.note}”</p>}
+        </section>
+
         <div className="flex items-center justify-between gap-4 border-t pt-4">
           <span className="text-2xl font-semibold tabular-nums">€{booking.price}</span>
           {upcoming && (

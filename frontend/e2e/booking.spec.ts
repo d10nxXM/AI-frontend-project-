@@ -1,4 +1,4 @@
-import { bookFullColour, dayChip, expect, slot, test } from './fixtures.ts'
+import { bookFullColour, dayChip, expect, fillClientDetails, slot, test } from './fixtures.ts'
 
 // Studio Lana, Wed 21 Oct (30 min slots): 09:00, 11:30, 14:00 and 16:30 are booked in the mock.
 
@@ -27,6 +27,8 @@ test('changing the service clears a time that no longer fits', async ({ page }) 
   await page.getByRole('button', { name: /^Blow-dry/ }).click()
   await dayChip(page, 'Wed 21 Oct').click()
   await slot(page, 'Wed 21 Oct, 11:00, 30 min').click()
+  // With valid details, only the time decides whether Book works.
+  await fillClientDetails(page)
   await expect(page.getByRole('button', { name: 'Book', exact: true })).toBeEnabled()
 
   await page.getByRole('button', { name: /Full colour/ }).click()

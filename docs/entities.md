@@ -31,6 +31,8 @@ Code: `frontend/src/features/listings/` (`types.ts`, `api/listings-api.ts`, `api
 Code: `frontend/src/features/bookings/` (`types.ts`, `api/bookings-api.ts`, `api/use-bookings.ts`).
 Booking flow on `/businesses/:id`: 1. choose a service, 2. choose a free time slot, 3. confirm with
 "Book" (`components/booking-summary.tsx`, `useCreateBooking`), then go to `/bookings`.
+Before confirming, the client enters name, phone and an optional note (`components/client-details-form.tsx`,
+rules in `client-details-schema.ts`); name and phone are remembered in this browser for next time.
 Booking detail on `/bookings/:id`: details, "Cancel booking" and "Change time" (move to another free
 slot of the same business; `components/reschedule-confirm.tsx`, `useRescheduleBooking`).
 
@@ -53,6 +55,9 @@ An appointment a client books at a business (hair salon, gym or service shop) fo
 | durationMinutes | number > 0 | yes | |
 | status | `booked` \| `cancelled` | yes | set to `booked` by the backend on create |
 | imageUrl | URL | no | business photo, 16:9 |
+| clientName | string, 2–60 characters | yes | who the booking is for; shown to the business |
+| clientPhone | string, 6–20 characters: digits, spaces, optional leading `+` | yes | e.g. `+382 67 123 456`; at least 6 digits |
+| note | string, at most 200 characters | no | message for the business, e.g. "First visit" |
 | createdAt | date | yes | assigned by the backend |
 
 **Relations:** a booking belongs to one client (the user who booked it), one business, one service and one time slot. The copied fields keep the booking readable even if the service changes later.
