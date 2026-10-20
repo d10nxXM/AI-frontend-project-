@@ -16,18 +16,25 @@ const slotVariants = cva(
         free: 'enabled:hover:bg-muted/50 disabled:opacity-60',
         booked: 'bg-muted text-muted-foreground',
         selected: 'border-primary bg-primary text-primary-foreground',
+        current: 'border-foreground font-semibold',
       },
     },
   },
 )
 
 const slotTimeVariants = cva('font-medium', {
-  variants: { state: { free: '', booked: 'line-through', selected: '' } },
+  variants: { state: { free: '', booked: 'line-through', selected: '', current: '' } },
 })
 
 const slotNoteVariants = cva('text-xs', {
-  variants: { state: { free: 'text-muted-foreground', booked: '', selected: '' } },
+  variants: { state: { free: 'text-muted-foreground', booked: '', selected: '', current: '' } },
 })
+
+const slotNotes: Partial<Record<'free' | 'booked' | 'selected' | 'current', string>> = {
+  booked: 'Booked',
+  selected: 'Selected',
+  current: 'Your time',
+}
 
 // startsAt is local time without a zone, so dates are formatted as UTC to keep the day as written.
 const dayFormat = new Intl.DateTimeFormat('en-GB', {
@@ -56,12 +63,20 @@ type SlotsByDayProps = {
   businessId: number
   // With onSelect free slots become buttons; disabled keeps them visible but not clickable.
   selectedId?: number
+  // The slot the user already holds (when moving a booking); shown as "Your time".
+  currentId?: number
   onSelect?: (slot: TimeSlot) => void
   disabled?: boolean
 }
 
 // Day chips and the slot times of the chosen day; booked slots say "Booked", not only a color.
-export function SlotsByDay({ businessId, selectedId, onSelect, disabled = false }: SlotsByDayProps) {
+export function SlotsByDay({
+  businessId,
+  selectedId,
+  currentId,
+  onSelect,
+  disabled = false,
+}: SlotsByDayProps) {
   const { data: slots, isLoading, error } = useSlots({ businessId })
   const [selectedDate, setSelectedDate] = useState<string>()
 
@@ -113,16 +128,19 @@ export function SlotsByDay({ businessId, selectedId, onSelect, disabled = false 
       ) : (
         <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
           {day.slots.map((slot) => {
-            const state = slot.status === 'booked' ? 'booked' : slot.id === selectedId ? 'selected' : 'free'
+            const state =
+              slot.id === currentId
+                ? 'current'
+                : slot.status === 'booked'
+                  ? 'booked'
+                  : slot.id === selectedId
+                    ? 'selected'
+                    : 'free'
             const content = (
               <>
                 <span className={slotTimeVariants({ state })}>{slot.startsAt.slice(11, 16)}</span>
                 <span className={slotNoteVariants({ state })}>
-                  {state === 'booked'
-                    ? 'Booked'
-                    : state === 'selected'
-                      ? 'Selected'
-                      : `${slot.durationMinutes} min`}
+                  {slotNotes[state] ?? `${slot.durationMinutes} min`}
                 </span>
               </>
             )
@@ -132,7 +150,7 @@ export function SlotsByDay({ businessId, selectedId, onSelect, disabled = false 
                 {onSelect ? (
                   <button
                     type="button"
-                    disabled={disabled || state === 'booked'}
+                    disabled={disabled || state === 'booked' || state === 'current'}
                     aria-pressed={state === 'selected'}
                     onClick={() => onSelect(slot)}
                     className={slotVariants({ state })}

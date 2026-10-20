@@ -1,4 +1,5 @@
 import { CalendarClock, MapPin, XCircle } from 'lucide-react'
+import { Link } from 'react-router'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -6,21 +7,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { categoryIcons } from '@/lib/categories'
 
 import type { Booking, BookingStatus } from '../types'
+import { formatStartsAt } from './format-starts-at'
 
 // Status is always shown as text, never by color alone (DESIGN.md).
 const statusBadges: Record<BookingStatus, { label: string; variant: 'outline' | 'secondary' }> = {
   booked: { label: 'Booked', variant: 'outline' },
   cancelled: { label: 'Cancelled', variant: 'secondary' },
 }
-
-const dateFormat = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-})
 
 type BookingCardProps = {
   booking: Booking
@@ -47,13 +40,20 @@ export function BookingCard({ booking, onCancel, isCancelling }: BookingCardProp
           </span>
           <Badge variant={status.variant}>{status.label}</Badge>
         </div>
-        <CardTitle className="text-lg">{booking.serviceName}</CardTitle>
+        <CardTitle className="text-lg">
+          <Link
+            to={`/bookings/${booking.id}`}
+            className="rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {booking.serviceName}
+          </Link>
+        </CardTitle>
         <p className="text-sm text-muted-foreground">{booking.serviceDescription}</p>
       </CardHeader>
       <CardContent className="flex flex-col gap-2 text-sm">
         <span className="flex items-center gap-2 tabular-nums">
           <CalendarClock aria-hidden className="size-4 text-muted-foreground" />
-          {dateFormat.format(new Date(booking.startsAt))} · {booking.durationMinutes} min
+          {formatStartsAt(booking.startsAt)} · {booking.durationMinutes} min
         </span>
         <span className="flex items-center gap-2">
           <MapPin aria-hidden className="size-4 text-muted-foreground" />

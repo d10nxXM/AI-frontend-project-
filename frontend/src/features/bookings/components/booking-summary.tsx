@@ -4,17 +4,7 @@ import { Button } from '@/components/ui/button'
 
 import { useCreateBooking } from '../api/use-bookings'
 import type { Booking, BookingDraft } from '../types'
-
-// startsAt is local time without a zone, so it is formatted as UTC to keep the time as written.
-const dateFormat = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-  timeZone: 'UTC',
-})
+import { formatStartsAt } from './format-starts-at'
 
 type BookingSummaryProps = {
   business: BookingDraft['business']
@@ -63,9 +53,7 @@ export function BookingSummary({
         <dt className="text-muted-foreground">Service</dt>
         <dd>{service ? service.name : 'Not chosen yet'}</dd>
         <dt className="text-muted-foreground">Time</dt>
-        <dd className="tabular-nums">
-          {slot ? dateFormat.format(new Date(`${slot.startsAt}Z`)) : 'Not chosen yet'}
-        </dd>
+        <dd className="tabular-nums">{slot ? formatStartsAt(slot.startsAt) : 'Not chosen yet'}</dd>
         <dt className="text-muted-foreground">Price</dt>
         <dd className="font-semibold tabular-nums">{service ? `€${service.price}` : '–'}</dd>
       </dl>

@@ -20,7 +20,7 @@ export function AppLayout() {
               <li key={link.to}>
                 <NavLink
                   to={link.to}
-                  end
+                  end={link.to === '/'}
                   className={({ isActive }) =>
                     cn(
                       'text-muted-foreground hover:text-foreground',

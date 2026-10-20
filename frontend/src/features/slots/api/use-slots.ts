@@ -18,3 +18,12 @@ export function useBookSlot() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['slots'] }),
   })
 }
+
+// Frees a slot after a booking was cancelled or moved. Mock only, like useBookSlot.
+export function useReleaseSlot() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => slotsApi.update(id, { status: 'free' }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['slots'] }),
+  })
+}
