@@ -1,4 +1,12 @@
-import { bookFullColour, dayChip, expect, fillClientDetails, slot, test } from './fixtures.ts'
+import {
+  bookFullColour,
+  dayChip,
+  expect,
+  fillClientDetails,
+  rememberCheckbox,
+  slot,
+  test,
+} from './fixtures.ts'
 
 // Goes to Studio Lana with Blow-dry and a time chosen, so only step 3 is left.
 async function chooseServiceAndTime(page: import('@playwright/test').Page) {
@@ -51,13 +59,59 @@ test('the booking shows who it is for, including the note', async ({ page }) => 
   await expect(bookedFor).toContainText('First visit')
 })
 
-test('name and phone are remembered for the next booking, the note is not', async ({ page }) => {
+test('details are not remembered unless the client ticks the box', async ({ page }) => {
   await bookFullColour(page)
 
   await page.goto('/businesses/2')
+  await expect(rememberCheckbox(page)).not.toBeChecked()
+  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveValue('')
+  await expect(page.getByRole('textbox', { name: 'Phone' })).toHaveValue('')
+  expect(await page.evaluate(() => localStorage.getItem('zakazi.client'))).toBeNull()
+})
+
+test('with the box ticked, name and phone are remembered for the next booking, the note is not', async ({
+  page,
+}) => {
+  await bookFullColour(page, { remember: true })
+
+  await page.goto('/businesses/2')
+  await expect(page.getByText('Filled in from your last booking on this device.')).toBeVisible()
+  await expect(rememberCheckbox(page)).toBeChecked()
   await expect(page.getByRole('textbox', { name: 'Name' })).toHaveValue('Ana Petrovic')
   await expect(page.getByRole('textbox', { name: 'Phone' })).toHaveValue('+382 69 555 123')
   await expect(page.getByRole('textbox', { name: /Note for the business/ })).toHaveValue('')
+})
+
+test('"Not you? Clear" forgets the saved details at once', async ({ page }) => {
+  await bookFullColour(page, { remember: true })
+
+  await page.goto('/businesses/2')
+  await page.getByRole('button', { name: 'Not you? Clear' }).click()
+  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveValue('')
+  await expect(page.getByRole('textbox', { name: 'Phone' })).toHaveValue('')
+  await expect(rememberCheckbox(page)).not.toBeChecked()
+  expect(await page.evaluate(() => localStorage.getItem('zakazi.client'))).toBeNull()
+
+  // Still forgotten after a reload.
+  await page.reload()
+  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveValue('')
+})
+
+test('unticking the box before booking forgets details saved earlier', async ({ page }) => {
+  await bookFullColour(page, { remember: true })
+  await page.goto('/businesses/2')
+  await expect(rememberCheckbox(page)).toBeChecked()
+
+  await page.getByRole('button', { name: /^Men's haircut Clipper and scissor cut, wash/ }).click()
+  await page
+    .getByRole('group', { name: 'Day' })
+    .getByRole('button', { name: /^Wed 21 Oct/ })
+    .click()
+  await page.getByRole('button', { name: 'Wed 21 Oct, 10:00, 30 min', exact: true }).click()
+  await rememberCheckbox(page).uncheck()
+  await page.getByRole('button', { name: 'Book', exact: true }).click()
+  await expect(page.getByText('Booked. See you there!')).toBeVisible()
+  expect(await page.evaluate(() => localStorage.getItem('zakazi.client'))).toBeNull()
 })
 
 test('existing bookings show the mock client', async ({ page }) => {

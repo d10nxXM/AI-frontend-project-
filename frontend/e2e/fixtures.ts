@@ -42,6 +42,9 @@ export const dayChip = (page: Page, day: string) =>
 // Slot buttons are named "<day>, <time>, <note>", e.g. "Wed 21 Oct, 10:00, Too short".
 export const slot = (page: Page, name: string) => page.getByRole('button', { name, exact: true })
 
+export const rememberCheckbox = (page: Page) =>
+  page.getByRole('checkbox', { name: 'Remember my name and phone on this device' })
+
 // Fills step 3 of the booking flow with a valid client.
 export async function fillClientDetails(page: Page, name = 'Ana Petrovic', phone = '+382 69 555 123') {
   await page.getByRole('textbox', { name: 'Name' }).fill(name)
@@ -49,12 +52,14 @@ export async function fillClientDetails(page: Page, name = 'Ana Petrovic', phone
 }
 
 // Books Full colour (120 min) at Studio Lana on Wed 21 Oct, 09:30 and waits for the new booking.
-export async function bookFullColour(page: Page) {
+// Pass `remember` to tick "Remember my name and phone on this device" (off by default).
+export async function bookFullColour(page: Page, { remember = false } = {}) {
   await page.goto('/businesses/1')
   await page.getByRole('button', { name: /Full colour/ }).click()
   await dayChip(page, 'Wed 21 Oct').click()
   await slot(page, 'Wed 21 Oct, 09:30, 120 min').click()
   await fillClientDetails(page)
+  if (remember) await rememberCheckbox(page).check()
   await page.getByRole('button', { name: 'Book', exact: true }).click()
   await expect(page.getByText('Booked. See you there!')).toBeVisible()
 }

@@ -1,4 +1,5 @@
 import { CalendarPlus } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 
@@ -11,20 +12,37 @@ type AddToCalendarButtonProps = {
 
 // Downloads the booking as an .ics file; opening it adds the appointment to the calendar.
 export function AddToCalendarButton({ booking }: AddToCalendarButtonProps) {
+  const [failed, setFailed] = useState(false)
+
   function download() {
-    const file = new Blob([bookingCalendarFile(booking)], { type: 'text/calendar;charset=utf-8' })
-    const url = URL.createObjectURL(file)
+    let content: string
+    try {
+      content = bookingCalendarFile(booking, `${window.location.origin}/bookings/${booking.id}`)
+    } catch {
+      setFailed(true)
+      return
+    }
+    setFailed(false)
+    const url = URL.createObjectURL(new Blob([content], { type: 'text/calendar;charset=utf-8' }))
     const link = document.createElement('a')
     link.href = url
     link.download = bookingCalendarFileName(booking)
     link.click()
-    URL.revokeObjectURL(url)
+    // Revoking in the same tick cancels the download in some browsers (older Safari).
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={download}>
-      <CalendarPlus aria-hidden />
-      Add to calendar
-    </Button>
+    <div className="flex flex-col gap-1">
+      <Button variant="outline" size="sm" onClick={download}>
+        <CalendarPlus aria-hidden />
+        Add to calendar
+      </Button>
+      {failed && (
+        <p role="alert" className="text-sm text-destructive">
+          This booking could not be added to a calendar.
+        </p>
+      )}
+    </div>
   )
 }

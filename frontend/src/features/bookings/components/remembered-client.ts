@@ -1,7 +1,8 @@
 import type { ClientDetails } from '../types'
 
-// Name and phone from the last booking, kept only in this browser so the form is filled in
-// next time. A convenience: everything works the same when storage is empty or blocked.
+// Name and phone from the last booking, kept only in this browser and only when the client ticks
+// "Remember my name and phone", so the form is filled in next time. A convenience: everything
+// works the same when storage is empty or blocked.
 const KEY = 'zakazi.client'
 
 type RememberedClient = Partial<Pick<ClientDetails, 'clientName' | 'clientPhone'>>
@@ -27,5 +28,14 @@ export function rememberClient({ clientName, clientPhone }: ClientDetails) {
     localStorage.setItem(KEY, JSON.stringify({ clientName, clientPhone }))
   } catch {
     // Storage can be full or blocked (private mode); the next form is just empty then.
+  }
+}
+
+// Removes the saved details ("Not you? Clear", or booking with "Remember" unticked).
+export function forgetClient() {
+  try {
+    localStorage.removeItem(KEY)
+  } catch {
+    // Nothing to do when storage is blocked: then nothing was saved either.
   }
 }

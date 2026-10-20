@@ -16,6 +16,9 @@ test('an upcoming booking can be added to the calendar as an .ics file', async (
   expect(ics).toContain('SUMMARY:Full colour at Studio Lana')
   expect(ics).toContain('LOCATION:Njegoseva 12\\, Podgorica')
   expect(ics).toContain('Booked for Ana Petrovic')
+  expect(ics).toMatch(/URL:http:\/\/localhost:5173\/bookings\/\d+/)
+  // No phone number or note in a file that may be synced to a shared calendar.
+  expect(ics).not.toContain('+382')
 })
 
 test('past and cancelled bookings have no calendar button', async ({ page }) => {

@@ -21,16 +21,21 @@ const booking: Booking = {
   imageUrl: '',
   clientName: 'Ana Petrovic',
   clientPhone: '+382 69 555 123',
+  note: 'Allergic to ammonia',
   createdAt: '2026-10-20',
 }
 
 const NOW = new Date(Date.UTC(2026, 9, 20, 8, 5, 9))
+const file = (b: Booking, url?: string) => bookingCalendarFile(b, url, NOW)
 const lines = (ics: string) => ics.split('\r\n')
+const unfold = (ics: string) => ics.replace(/\r\n /g, '')
+// Every property name the file is allowed to have.
+const ALLOWED =
+  /^(BEGIN|END|VERSION|PRODID|CALSCALE|METHOD|UID|DTSTAMP|DTSTART|DTEND|SUMMARY|LOCATION|DESCRIPTION|URL)[:;]/
 
 describe('bookingCalendarFile', () => {
   it('is one event with local start and end times', () => {
-    const ics = bookingCalendarFile(booking, NOW)
-    expect(lines(ics)).toEqual(
+    expect(lines(file(booking))).toEqual(
       expect.arrayContaining([
         'BEGIN:VCALENDAR',
         'BEGIN:VEVENT',
@@ -47,31 +52,60 @@ describe('bookingCalendarFile', () => {
     )
   })
 
+  it('leaves out the phone number and the note, and links to the booking', () => {
+    const ics = unfold(file(booking, 'https://zakazi.me/bookings/7'))
+    expect(ics).toContain('DESCRIPTION:Booked for Ana Petrovic on Zakazi.me')
+    expect(ics).toContain('URL:https://zakazi.me/bookings/7')
+    expect(ics).not.toContain('555')
+    expect(ics).not.toContain('ammonia')
+  })
+
   it('uses CRLF line endings, including after the last line', () => {
-    const ics = bookingCalendarFile(booking, NOW)
+    const ics = file(booking)
     expect(ics.endsWith('END:VCALENDAR\r\n')).toBe(true)
     expect(ics.replace(/\r\n/g, '')).not.toMatch(/[\r\n]/)
   })
 
   it('ends on the next day when the booking runs past midnight', () => {
     const late = { ...booking, startsAt: '2026-10-21T23:30', durationMinutes: 60 }
-    expect(lines(bookingCalendarFile(late, NOW))).toContain('DTEND:20261022T003000')
+    expect(lines(file(late))).toContain('DTEND:20261022T003000')
   })
 
-  it('escapes commas, semicolons, backslashes and line breaks in text', () => {
-    const tricky = { ...booking, note: 'Bring photo; short\\long, ok\nThanks' }
-    const ics = bookingCalendarFile(tricky, NOW).replace(/\r\n /g, '')
-    expect(ics).toContain(
-      'DESCRIPTION:Booked for Ana Petrovic\\, +382 69 555 123\\nBring photo\\; short\\\\long\\, ok\\nThanks',
-    )
+  it('escapes commas, semicolons and backslashes in text', () => {
+    const tricky = { ...booking, serviceName: 'Cut; wash\\dry, style' }
+    expect(unfold(file(tricky))).toContain('SUMMARY:Cut\\; wash\\\\dry\\, style at Studio Lana')
   })
 
-  it('folds lines longer than 75 characters', () => {
-    const long = { ...booking, serviceName: 'Very long service name '.repeat(5).trim() }
-    const ics = bookingCalendarFile(long, NOW)
-    expect(lines(ics).every((line) => line.length <= 75)).toBe(true)
-    // Unfolding (removing CRLF + space) gives back the full line.
-    expect(ics.replace(/\r\n /g, '')).toContain(`SUMMARY:${long.serviceName} at Studio Lana`)
+  it('cannot be tricked into new properties by any kind of line break or control character', () => {
+    const attack = {
+      ...booking,
+      serviceName: 'Cut\rURL:https://evil.example\nATTENDEE:mailto:x@evil.example\r\nBEGIN:VALARM',
+      address: `Njegoseva 12${String.fromCharCode(0)}${String.fromCharCode(11)}${String.fromCharCode(127)}`,
+      clientName: 'Ana\rORGANIZER:mailto:boss@evil.example',
+    }
+    const ics = file(attack)
+    // No raw CR or LF except the CRLF between lines.
+    expect(ics.replace(/\r\n/g, '')).not.toMatch(/[\r\n]/)
+    // After unfolding, every line is one of the known properties.
+    for (const line of lines(unfold(ics)).filter(Boolean)) expect(line).toMatch(ALLOWED)
+    expect(unfold(ics)).toContain('SUMMARY:Cut\\nURL:https://evil.example\\nATTENDEE')
+    expect(unfold(ics)).toContain('LOCATION:Njegoseva 12\\, Podgorica')
+  })
+
+  it('folds lines longer than 75 bytes, counting non-ASCII letters as more than one byte', () => {
+    const long = { ...booking, serviceName: 'Šišanje i feniranje za duže kose '.repeat(4).trim() }
+    const ics = file(long)
+    const bytes = (text: string) => new TextEncoder().encode(text).length
+    expect(lines(ics).every((line) => bytes(line) <= 75)).toBe(true)
+    // Unfolding (removing CRLF + space) gives back the full line, with no letter split in two.
+    expect(unfold(ics)).toContain(`SUMMARY:${long.serviceName} at Studio Lana`)
+  })
+
+  it('refuses an invalid time or duration instead of writing it into the file', () => {
+    expect(() => file({ ...booking, startsAt: '2026-10-21T18:30\r\nX:1' })).toThrow('not valid')
+    expect(() => file({ ...booking, startsAt: '2026-13-45T99:99' })).toThrow('not valid')
+    expect(() => file({ ...booking, durationMinutes: 0 })).toThrow('not valid')
+    expect(() => file({ ...booking, durationMinutes: 1.5 })).toThrow('not valid')
   })
 })
 

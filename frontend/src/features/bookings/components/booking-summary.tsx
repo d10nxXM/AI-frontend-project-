@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useCreateBooking } from '../api/use-bookings'
 import type { Booking, BookingDraft, ClientDetails } from '../types'
 import { formatStartsAt } from './format-starts-at'
-import { rememberClient } from './remembered-client'
+import { forgetClient, rememberClient } from './remembered-client'
 
 type BookingSummaryProps = {
   business: BookingDraft['business']
@@ -13,6 +13,8 @@ type BookingSummaryProps = {
   slot?: BookingDraft['slot']
   // Valid details from ClientDetailsForm, or undefined while the form is incomplete.
   client?: ClientDetails
+  // Whether the client ticked "Remember my name and phone".
+  remember?: boolean
   // True while the caller finishes up after the booking was created (e.g. marking the slot).
   finishing?: boolean
   onBooked: (booking: Booking) => void
@@ -24,6 +26,7 @@ export function BookingSummary({
   service,
   slot,
   client,
+  remember = false,
   finishing = false,
   onBooked,
 }: BookingSummaryProps) {
@@ -51,7 +54,8 @@ export function BookingSummary({
       },
       {
         onSuccess: (booking) => {
-          rememberClient(client)
+          if (remember) rememberClient(client)
+          else forgetClient()
           onBooked(booking)
         },
       },

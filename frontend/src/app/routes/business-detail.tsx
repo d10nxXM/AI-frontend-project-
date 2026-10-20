@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 
 import { NotFound } from '@/app/routes/not-found'
@@ -21,6 +21,12 @@ export function BusinessDetail() {
   const [service, setService] = useState<Service>()
   const [slot, setSlot] = useState<TimeSlot>()
   const [client, setClient] = useState<ClientDetails>()
+  const [remember, setRemember] = useState(false)
+  // Stable, because the form reports through it on every change.
+  const changeClient = useCallback((details: ClientDetails | undefined, rememberDetails: boolean) => {
+    setClient(details)
+    setRemember(rememberDetails)
+  }, [])
 
   if (!Number.isInteger(id) || id <= 0) return <NotFound />
 
@@ -68,7 +74,7 @@ export function BusinessDetail() {
 
             <div className="flex flex-col gap-4">
               <h2 className="text-xl font-semibold">3. Your details</h2>
-              <ClientDetailsForm onChange={setClient} />
+              <ClientDetailsForm onChange={changeClient} />
             </div>
 
             <div className="flex flex-col gap-4">
@@ -78,6 +84,7 @@ export function BusinessDetail() {
                 service={service}
                 slot={slot}
                 client={client}
+                remember={remember}
                 finishing={bookRange.isPending}
                 onBooked={handleBooked}
               />

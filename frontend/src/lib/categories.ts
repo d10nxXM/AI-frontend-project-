@@ -10,6 +10,7 @@ export const categoryIcons: Record<Category, typeof Scissors> = {
   service: Wrench,
 }
 
-// Narrows any string (e.g. from the URL) to a Category.
+// Narrows any string (e.g. from the URL) to a Category. Object.hasOwn, not `in`, so inherited
+// keys like `constructor` or `__proto__` do not count as categories.
 export const isCategory = (value: string | null): value is Category =>
-  value !== null && value in categoryIcons
+  value !== null && Object.hasOwn(categoryIcons, value)
