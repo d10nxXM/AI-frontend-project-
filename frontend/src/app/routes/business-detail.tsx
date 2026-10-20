@@ -1,14 +1,30 @@
 import { ArrowLeft } from 'lucide-react'
-import { Link, useParams } from 'react-router'
+import { useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router'
 
 import { NotFound } from '@/app/routes/not-found'
+import { BookingSummary } from '@/features/bookings/components/booking-summary'
+import type { Booking } from '@/features/bookings/types'
 import { BusinessDetail as BusinessInfo } from '@/features/businesses/components/business-detail'
 import { ServicesList } from '@/features/services/components/services-list'
+import type { Service } from '@/features/services/types'
+import { useBookSlot } from '@/features/slots/api/use-slots'
 import { SlotsByDay } from '@/features/slots/components/slots-by-day'
+import type { TimeSlot } from '@/features/slots/types'
 
+// Booking flow on the business page: 1. service, 2. time slot, 3. confirm.
 export function BusinessDetail() {
   const id = Number(useParams().id)
+  const navigate = useNavigate()
+  const bookSlot = useBookSlot()
+  const [service, setService] = useState<Service>()
+  const [slot, setSlot] = useState<TimeSlot>()
+
   if (!Number.isInteger(id) || id <= 0) return <NotFound />
+
+  // The real POST /bookings marks the slot itself; with the mock the route does it here.
+  const handleBooked = (booking: Booking) =>
+    bookSlot.mutate(booking.slotId, { onSettled: () => navigate('/bookings') })
 
   return (
     <section className="flex flex-col gap-8">
@@ -21,16 +37,31 @@ export function BusinessDetail() {
       </Link>
 
       <BusinessInfo id={id}>
-        <div className="flex min-w-0 flex-col gap-8">
-          <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-semibold">Free time slots</h2>
-            <SlotsByDay businessId={id} />
+        {(business) => (
+          <div className="flex min-w-0 flex-col gap-8">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xl font-semibold">1. Choose a service</h2>
+              <ServicesList businessId={id} selectedId={service?.id} onSelect={setService} />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xl font-semibold">2. Choose a time</h2>
+              {!service && <p className="text-sm text-muted-foreground">Choose a service first.</p>}
+              <SlotsByDay businessId={id} selectedId={slot?.id} onSelect={setSlot} disabled={!service} />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xl font-semibold">3. Confirm</h2>
+              <BookingSummary
+                business={business}
+                service={service}
+                slot={slot}
+                finishing={bookSlot.isPending}
+                onBooked={handleBooked}
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-semibold">Services</h2>
-            <ServicesList businessId={id} />
-          </div>
-        </div>
+        )}
       </BusinessInfo>
     </section>
   )

@@ -7,12 +7,13 @@ import { categoryIcons } from '@/lib/categories'
 import { NotFoundError } from '@/lib/mock-db'
 
 import { useBusiness } from '../api/use-businesses'
+import type { Business } from '../types'
 import { categoryLabels } from './category-meta'
 
 type BusinessDetailProps = {
   id: number
   // Shown next to the info (below it on phones), only once the business has loaded.
-  children?: ReactNode
+  children?: (business: Business) => ReactNode
 }
 
 // Cover photo, name and the practical info, with loading, not-found and error states.
@@ -80,7 +81,7 @@ export function BusinessDetail({ id, children }: BusinessDetailProps) {
           </div>
         </dl>
       </article>
-      {children}
+      {children?.(business)}
     </div>
   )
 }

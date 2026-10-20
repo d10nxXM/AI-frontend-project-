@@ -29,6 +29,8 @@ Code: `frontend/src/features/listings/` (`types.ts`, `api/listings-api.ts`, `api
 ## Booking
 
 Code: `frontend/src/features/bookings/` (`types.ts`, `api/bookings-api.ts`, `api/use-bookings.ts`).
+Booking flow on `/businesses/:id`: 1. choose a service, 2. choose a free time slot, 3. confirm with
+"Book" (`components/booking-summary.tsx`, `useCreateBooking`), then go to `/bookings`.
 
 An appointment a client books at a business (hair salon, gym or service shop) for one service.
 
@@ -52,7 +54,7 @@ An appointment a client books at a business (hair salon, gym or service shop) fo
 
 **Relations:** a booking belongs to one client (the user who booked it), one business, one service and one time slot. The copied fields keep the booking readable even if the service changes later.
 
-**Access rules:** cancelling a booking sets its time slot back to `free`; a client sees and cancels only their own bookings; a business owner sees the bookings for their business; only a signed-in user can create a booking.
+**Access rules:** creating a booking sets its time slot to `booked` (the backend does this in `POST /bookings`; the mock does it from the frontend with `useBookSlot`); cancelling a booking sets its time slot back to `free`; a client sees and cancels only their own bookings; a business owner sees the bookings for their business; only a signed-in user can create a booking.
 
 **API the frontend expects:** `GET /bookings?search=`, `GET /bookings/:id`, `POST /bookings`, `PATCH /bookings/:id` (cancel = `{ "status": "cancelled" }`), `DELETE /bookings/:id`.
 

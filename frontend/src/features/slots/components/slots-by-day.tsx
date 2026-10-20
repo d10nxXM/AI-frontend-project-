@@ -7,12 +7,26 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useSlots } from '../api/use-slots'
 import type { TimeSlot } from '../types'
 
-const slotVariants = cva('flex flex-col items-center rounded-lg border p-2 text-sm tabular-nums', {
-  variants: { status: { free: '', booked: 'bg-muted text-muted-foreground' } },
-})
+// Free, booked and selected differ by text and style, not by color alone (DESIGN.md).
+const slotVariants = cva(
+  'flex w-full flex-col items-center rounded-lg border p-2 text-sm tabular-nums outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+  {
+    variants: {
+      state: {
+        free: 'enabled:hover:bg-muted/50 disabled:opacity-60',
+        booked: 'bg-muted text-muted-foreground',
+        selected: 'border-primary bg-primary text-primary-foreground',
+      },
+    },
+  },
+)
 
 const slotTimeVariants = cva('font-medium', {
-  variants: { status: { free: '', booked: 'line-through' } },
+  variants: { state: { free: '', booked: 'line-through', selected: '' } },
+})
+
+const slotNoteVariants = cva('text-xs', {
+  variants: { state: { free: 'text-muted-foreground', booked: '', selected: '' } },
 })
 
 // startsAt is local time without a zone, so dates are formatted as UTC to keep the day as written.
@@ -40,10 +54,14 @@ function groupByDay(slots: TimeSlot[]) {
 
 type SlotsByDayProps = {
   businessId: number
+  // With onSelect free slots become buttons; disabled keeps them visible but not clickable.
+  selectedId?: number
+  onSelect?: (slot: TimeSlot) => void
+  disabled?: boolean
 }
 
 // Day chips and the slot times of the chosen day; booked slots say "Booked", not only a color.
-export function SlotsByDay({ businessId }: SlotsByDayProps) {
+export function SlotsByDay({ businessId, selectedId, onSelect, disabled = false }: SlotsByDayProps) {
   const { data: slots, isLoading, error } = useSlots({ businessId })
   const [selectedDate, setSelectedDate] = useState<string>()
 
@@ -94,14 +112,39 @@ export function SlotsByDay({ businessId }: SlotsByDayProps) {
         <p className="text-muted-foreground">Fully booked on {formatDay(day.date)}. Pick another day.</p>
       ) : (
         <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
-          {day.slots.map((slot) => (
-            <li key={slot.id} className={slotVariants({ status: slot.status })}>
-              <span className={slotTimeVariants({ status: slot.status })}>{slot.startsAt.slice(11, 16)}</span>
-              <span className="text-xs text-muted-foreground">
-                {slot.status === 'booked' ? 'Booked' : `${slot.durationMinutes} min`}
-              </span>
-            </li>
-          ))}
+          {day.slots.map((slot) => {
+            const state = slot.status === 'booked' ? 'booked' : slot.id === selectedId ? 'selected' : 'free'
+            const content = (
+              <>
+                <span className={slotTimeVariants({ state })}>{slot.startsAt.slice(11, 16)}</span>
+                <span className={slotNoteVariants({ state })}>
+                  {state === 'booked'
+                    ? 'Booked'
+                    : state === 'selected'
+                      ? 'Selected'
+                      : `${slot.durationMinutes} min`}
+                </span>
+              </>
+            )
+
+            return (
+              <li key={slot.id}>
+                {onSelect ? (
+                  <button
+                    type="button"
+                    disabled={disabled || state === 'booked'}
+                    aria-pressed={state === 'selected'}
+                    onClick={() => onSelect(slot)}
+                    className={slotVariants({ state })}
+                  >
+                    {content}
+                  </button>
+                ) : (
+                  <div className={slotVariants({ state })}>{content}</div>
+                )}
+              </li>
+            )
+          })}
         </ul>
       )}
     </div>
