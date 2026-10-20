@@ -10,6 +10,7 @@ import { NotFoundError } from '@/lib/mock-db'
 import { useBusiness } from '../api/use-businesses'
 import type { Business } from '../types'
 import { categoryLabels } from './category-meta'
+import { FavoriteButton } from './favorite-button'
 
 type BusinessDetailProps = {
   id: number
@@ -62,7 +63,10 @@ export function BusinessDetail({ id, children }: BusinessDetailProps) {
             <Icon aria-hidden />
             {categoryLabels[business.category]}
           </Badge>
-          <h1 className="text-3xl font-bold text-balance">{business.name}</h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-3xl font-bold text-balance">{business.name}</h1>
+            <FavoriteButton business={business} className="shrink-0" />
+          </div>
           <p className="text-muted-foreground">{business.description}</p>
         </div>
 

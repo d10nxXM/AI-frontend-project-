@@ -17,6 +17,8 @@ type BusinessesListProps = {
   waiting?: boolean
   // Extra line on each card, e.g. the next free time from the slots feature.
   renderExtra?: (business: Business) => ReactNode
+  // Shown instead of the default text when nothing matches (e.g. no favorites yet).
+  emptyMessage?: string
 }
 
 // Businesses with all three states: loading, empty and error.
@@ -27,6 +29,7 @@ export function BusinessesList({
   include,
   waiting = false,
   renderExtra,
+  emptyMessage = 'No businesses match your search and filters.',
 }: BusinessesListProps) {
   const { data, isLoading, error } = useBusinesses(filter)
   const businesses = include ? data?.filter(include) : data
@@ -48,7 +51,7 @@ export function BusinessesList({
   if (!businesses || businesses.length === 0) {
     return (
       <div className="mt-8 flex flex-col items-start gap-4">
-        <p className="text-muted-foreground">No businesses match your search and filters.</p>
+        <p className="text-muted-foreground">{emptyMessage}</p>
         {onClearFilters && (
           <Button variant="outline" onClick={onClearFilters}>
             Clear filters

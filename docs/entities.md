@@ -166,5 +166,16 @@ convenience; anyone can call the API directly, so the server repeats every rule.
   client data.
 - **Fewer requests for listings:** return a computed `nextFreeAt` on each business in `GET /businesses` and
   support `GET /businesses?available=today`, instead of the frontend asking for slots once per card.
+- **Favorites (when synced to an account):** routes are `GET /me/favorites`, `PUT /me/favorites/:businessId` and
+  `DELETE /me/favorites/:businessId`; the user comes only from the session, never from a `userId` in the path,
+  query or body. `businessId` must be a positive integer of an existing business; adding and removing are
+  idempotent; at most 100 per user (the same cap as the frontend). On first sign-in the browser's
+  `zakazi.favorites` list is merged on the server with the same checks, never trusted as-is. Favorites are
+  private: never returned on public business endpoints or shown to business owners. Mutations need CSRF
+  protection (or same-site cookies) and a per-user rate limit. Favorites are deleted with the account and
+  included in the user's data export. Today they live only in the browser (no consent box needed: only
+  public business ids, saved on an explicit tap).
+- **No framing:** serve the app with `Content-Security-Policy: frame-ancestors 'none'` (or
+  `X-Frame-Options: DENY`), so another site cannot overlay it and trick a click on a heart, "Book" or "Cancel".
 - **Secrets:** only in environment variables; `.env` files are git-ignored (only `.env.example` is
   committed). `VITE_*` variables are public, because they are bundled into the browser code.
