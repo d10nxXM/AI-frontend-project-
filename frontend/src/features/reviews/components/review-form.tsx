@@ -78,7 +78,10 @@ export function ReviewForm({ booking }: ReviewFormProps) {
                 name={`${id}-rating`}
                 value={value}
                 checked={rating === value}
-                onChange={() => setRating(value)}
+                onChange={() => {
+                  setRating(value)
+                  setRatingError('')
+                }}
                 className="sr-only"
               />
               <Star

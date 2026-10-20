@@ -65,16 +65,15 @@ export function ServicesList({ businessId, selectedId, onSelect, preselectId }: 
         const content = (
           <>
             <div className="flex flex-col gap-1">
-              <span className="flex items-center gap-2 font-medium">
-                {service.name}
-                {selected && (
-                  <span className="flex items-center gap-1 text-xs font-normal text-muted-foreground">
-                    <Check aria-hidden className="size-3" />
-                    Selected
-                  </span>
-                )}
-              </span>
+              <span className="font-medium">{service.name}</span>
               <span className="text-sm text-muted-foreground">{service.description}</span>
+              {/* Under the description, so it does not squeeze the name on a phone. */}
+              {selected && (
+                <span className="flex items-center gap-1 text-xs font-medium">
+                  <Check aria-hidden className="size-3" />
+                  Selected
+                </span>
+              )}
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1 tabular-nums">
               <span className="font-semibold">€{service.price}</span>

@@ -9,6 +9,6 @@ try {
       ? saved === 'dark'
       : window.matchMedia('(prefers-color-scheme: dark)').matches
   if (dark) document.documentElement.classList.add('dark')
-} catch (e) {
+} catch {
   // Storage or matchMedia unavailable: stay light.
 }

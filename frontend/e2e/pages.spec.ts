@@ -48,3 +48,12 @@ test('the long address keeps its city visible', async ({ page }) => {
   await expect(page.getByText('Bulevar Svetog Petra Cetinjskog 45, Podgorica')).toBeVisible()
   expect(await horizontalOverflow(page)).toBe(0)
 })
+
+test('a bookings search with no results can be cleared', async ({ page }) => {
+  await page.goto('/bookings')
+  await page.getByRole('textbox', { name: 'Search bookings' }).fill('zzzz')
+  await expect(page.getByText('No bookings match "zzzz".')).toBeVisible()
+  await page.getByRole('button', { name: 'Clear search' }).click()
+  await expect(page.getByRole('textbox', { name: 'Search bookings' })).toHaveValue('')
+  await expect(page.getByRole('region', { name: 'Upcoming' })).toBeVisible()
+})

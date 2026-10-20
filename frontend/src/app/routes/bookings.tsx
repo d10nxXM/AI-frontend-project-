@@ -25,7 +25,11 @@ export function Bookings() {
         />
       </div>
 
-      <BookingsList search={debouncedSearch} onCancelled={(booking) => releaseRange.mutate(booking)} />
+      <BookingsList
+        search={debouncedSearch}
+        onCancelled={(booking) => releaseRange.mutate(booking)}
+        onClearSearch={() => setSearch('')}
+      />
     </section>
   )
 }

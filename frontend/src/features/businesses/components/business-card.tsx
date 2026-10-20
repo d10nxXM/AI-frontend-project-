@@ -28,7 +28,8 @@ export function BusinessCard({ business, extra }: BusinessCardProps) {
         {business.imageUrl ? (
           <img
             src={business.imageUrl}
-            alt={business.name}
+            // Decorative: the name next to it is the link, so screen readers do not hear it twice.
+            alt=""
             className="size-16 shrink-0 rounded-md bg-muted object-cover sm:aspect-video sm:size-auto sm:w-full sm:rounded-none"
           />
         ) : (

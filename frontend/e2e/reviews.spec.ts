@@ -38,6 +38,8 @@ test('a past booking can be rated once, and the review shows on the business pag
 
   await star(page, '4 stars').click()
   await expect(page.getByText('4 out of 5')).toBeVisible()
+  // Choosing a rating clears the error at once.
+  await expect(page.getByText('Choose 1 to 5 stars.')).toBeHidden()
   await page.getByRole('textbox', { name: /Comment/ }).fill('  Lovely colour, friendly team.  ')
   await page.getByRole('button', { name: 'Send review' }).click()
 

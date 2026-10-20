@@ -17,7 +17,8 @@ const slotVariants = cva(
   {
     variants: {
       state: {
-        free: 'enabled:hover:bg-muted/50',
+        // Before a service is chosen: visibly inactive, but still readable (no opacity).
+        free: 'enabled:hover:bg-muted/50 disabled:border-dashed disabled:bg-muted/40 disabled:text-muted-foreground',
         tooShort: 'border-dashed text-muted-foreground',
         booked: 'bg-muted text-muted-foreground',
         selected: 'border-primary bg-primary text-primary-foreground',
@@ -106,7 +107,11 @@ export function SlotsByDay({
   }
 
   if (error) {
-    return <p className="text-destructive">Time slots failed to load. Please try again.</p>
+    return (
+      <p role="alert" className="text-destructive">
+        Time slots failed to load. Please try again.
+      </p>
+    )
   }
 
   const days = groupByDay(slots ?? [])
