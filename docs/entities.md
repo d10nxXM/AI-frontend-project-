@@ -152,6 +152,11 @@ convenience; anyone can call the API directly, so the server repeats every rule.
   a line break or control character can inject content.
 - **Encode text for each output:** escape `note` and other free text for every place it leaves the React UI
   (HTML e-mail, SMS, `.ics`); in CSV exports prefix values starting with `= + - @` so they are not formulas.
+- **One business per booking:** `POST /bookings` and `PATCH /bookings/:id` reject the request unless the slot
+  and the service belong to the same business (`slot.businessId === service.businessId`) and every slot the
+  duration covers is free and belongs to that business. `GET /services?businessId=` always applies the filter.
+  The frontend's "Book again" link (`/businesses/:id?service=:serviceId`) only preselects a service the
+  business offers, but anyone can call the API directly.
 - **Times:** `startsAt` is always `YYYY-MM-DDTHH:mm` and `durationMinutes` a positive whole number; reject
   anything else.
 - **Abuse limits:** only signed-in users create bookings; rate-limit `POST /bookings` per user and per IP;

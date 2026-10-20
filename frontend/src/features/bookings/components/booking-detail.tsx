@@ -13,6 +13,7 @@ import { NotFoundError } from '@/lib/mock-db'
 import { useBooking, useCancelBooking } from '../api/use-bookings'
 import type { Booking } from '../types'
 import { AddToCalendarButton } from './add-to-calendar-button'
+import { BookAgainLink } from './book-again-link'
 import { CancelBookingButton } from './cancel-booking-button'
 import { formatStartsAt } from './format-starts-at'
 
@@ -125,7 +126,7 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-4">
           <span className="text-2xl font-semibold tabular-nums">€{booking.price}</span>
-          {upcoming && (
+          {upcoming ? (
             <div className="flex flex-wrap gap-2">
               <AddToCalendarButton booking={booking} />
               <CancelBookingButton
@@ -136,6 +137,8 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
                 }
               />
             </div>
+          ) : (
+            <BookAgainLink booking={booking} />
           )}
         </div>
         {cancelBooking.isError && (
@@ -145,13 +148,7 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
         )}
         {cancelled && (
           <p role="status" className="text-sm">
-            This booking is cancelled.{' '}
-            <Link
-              to={`/businesses/${booking.businessId}`}
-              className="rounded-sm font-medium text-foreground underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-ring"
-            >
-              Book again at {booking.businessName}
-            </Link>
+            This booking is cancelled.
           </p>
         )}
       </article>

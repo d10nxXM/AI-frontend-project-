@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority'
 import { Check } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -21,11 +22,23 @@ type ServicesListProps = {
   // With onSelect the rows become buttons and the chosen one is marked "Selected".
   selectedId?: number
   onSelect?: (service: Service) => void
+  // Chosen once the services have loaded, e.g. from "Book again" (?service=1). Ignored when the
+  // business no longer offers it.
+  preselectId?: number
 }
 
 // A business's services as a plain divided list, with loading, empty and error states.
-export function ServicesList({ businessId, selectedId, onSelect }: ServicesListProps) {
+export function ServicesList({ businessId, selectedId, onSelect, preselectId }: ServicesListProps) {
   const { data: services, isLoading, error } = useServices(businessId)
+
+  // Preselect only once, so the client can still pick another service afterwards.
+  const preselected = useRef(false)
+  useEffect(() => {
+    if (preselected.current || !services || !onSelect || preselectId === undefined) return
+    preselected.current = true
+    const service = services.find((s) => s.id === preselectId)
+    if (service && selectedId === undefined) onSelect(service)
+  }, [services, onSelect, preselectId, selectedId])
 
   if (isLoading) {
     return (
