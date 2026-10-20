@@ -11,7 +11,8 @@ type RescheduleConfirmProps = {
   slot?: BookingDraft['slot']
   // True while the caller finishes up after the move (e.g. swapping the slots).
   finishing?: boolean
-  onRescheduled: (booking: Booking, previousSlotId: number) => void
+  // Gets the moved booking and the booking as it was before the move.
+  onRescheduled: (booking: Booking, previous: Booking) => void
 }
 
 // Old time -> new time and the one main action, "Change time".
@@ -28,7 +29,7 @@ export function RescheduleConfirm({
     if (!slot) return
     reschedule.mutate(
       { id: booking.id, slot },
-      { onSuccess: (updated) => onRescheduled(updated, booking.slotId) },
+      { onSuccess: (updated) => onRescheduled(updated, booking) },
     )
   }
 

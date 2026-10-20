@@ -1,5 +1,8 @@
 import { Button } from '@/components/ui/button'
 
+// The selected chip gets a dark border and fill, not only a lighter gray.
+const pressedChip = 'aria-pressed:border-foreground aria-pressed:bg-muted'
+
 type ChipGroupProps<T extends string> = {
   label: string
   options: { value: T; label: string }[]
@@ -14,7 +17,8 @@ export function ChipGroup<T extends string>({ label, options, value, onChange }:
       <span className="w-full text-sm text-muted-foreground sm:w-16">{label}</span>
       <Button
         size="sm"
-        variant={value === undefined ? 'secondary' : 'outline'}
+        variant="outline"
+        className={pressedChip}
         aria-pressed={value === undefined}
         onClick={() => onChange(undefined)}
       >
@@ -24,7 +28,8 @@ export function ChipGroup<T extends string>({ label, options, value, onChange }:
         <Button
           key={option.value}
           size="sm"
-          variant={value === option.value ? 'secondary' : 'outline'}
+          variant="outline"
+          className={pressedChip}
           aria-pressed={value === option.value}
           onClick={() => onChange(value === option.value ? undefined : option.value)}
         >

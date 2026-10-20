@@ -42,7 +42,8 @@ export function BusinessDetail({ id, children }: BusinessDetailProps) {
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-      <article className="flex flex-col gap-4">
+      <title>{`${business.name} · Zakazi.me`}</title>
+      <article className="flex flex-col gap-4 lg:sticky lg:top-8 lg:self-start">
         {business.imageUrl ? (
           <img
             src={business.imageUrl}
@@ -60,7 +61,7 @@ export function BusinessDetail({ id, children }: BusinessDetailProps) {
             <Icon aria-hidden />
             {categoryLabels[business.category]}
           </Badge>
-          <h1 className="text-3xl font-bold">{business.name}</h1>
+          <h1 className="text-3xl font-bold text-balance">{business.name}</h1>
           <p className="text-muted-foreground">{business.description}</p>
         </div>
 

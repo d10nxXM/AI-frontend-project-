@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { NotFoundError } from '@/lib/mock-db'
 
@@ -9,6 +9,8 @@ export function useBookings(search: string) {
   return useQuery({
     queryKey: ['bookings', search],
     queryFn: () => bookingsApi.list(search),
+    // Keep showing the last results while a new search loads, instead of skeletons.
+    placeholderData: keepPreviousData,
   })
 }
 

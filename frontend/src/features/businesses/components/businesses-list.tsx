@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { useBusinesses } from '../api/use-businesses'
@@ -6,10 +7,11 @@ import { BusinessCard } from './business-card'
 
 type BusinessesListProps = {
   filter: BusinessFilter
+  onClearFilters?: () => void
 }
 
 // Businesses with all three states: loading, empty and error.
-export function BusinessesList({ filter }: BusinessesListProps) {
+export function BusinessesList({ filter, onClearFilters }: BusinessesListProps) {
   const { data: businesses, isLoading, error } = useBusinesses(filter)
 
   if (isLoading) {
@@ -27,7 +29,16 @@ export function BusinessesList({ filter }: BusinessesListProps) {
   }
 
   if (!businesses || businesses.length === 0) {
-    return <p className="mt-8 text-muted-foreground">No businesses match your search and filters.</p>
+    return (
+      <div className="mt-8 flex flex-col items-start gap-4">
+        <p className="text-muted-foreground">No businesses match your search and filters.</p>
+        {onClearFilters && (
+          <Button variant="outline" onClick={onClearFilters}>
+            Clear filters
+          </Button>
+        )}
+      </div>
+    )
   }
 
   return (

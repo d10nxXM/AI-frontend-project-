@@ -16,3 +16,10 @@ export type SlotFilter = {
   date?: string
   status?: SlotStatus
 }
+
+// The time a booking occupies; it can span several consecutive slots.
+export type TimeRange = {
+  businessId: number
+  startsAt: string
+  durationMinutes: number
+}

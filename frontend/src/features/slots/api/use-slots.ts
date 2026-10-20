@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import type { SlotFilter } from '../types'
+import type { SlotFilter, TimeRange, TimeSlot } from '../types'
+import { slotsInRange } from './slot-range'
 import { slotsApi } from './slots-api'
 
 export function useSlots(filter: SlotFilter) {
@@ -10,20 +11,26 @@ export function useSlots(filter: SlotFilter) {
   })
 }
 
-// Marks a slot as taken after a booking. Mock only: the real POST /bookings does this itself.
-export function useBookSlot() {
+// Sets every slot a booking covers to `status`. Mock only: the real POST and PATCH
+// /bookings do this on the backend, so these hooks go away with it.
+async function setRangeStatus(range: TimeRange, status: TimeSlot['status']) {
+  const daySlots = await slotsApi.list({ businessId: range.businessId, date: range.startsAt.slice(0, 10) })
+  const covered = slotsInRange(daySlots, range.startsAt, range.durationMinutes)
+  await Promise.all(covered.map((slot) => slotsApi.update(slot.id, { status })))
+}
+
+export function useBookRange() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => slotsApi.update(id, { status: 'booked' }),
+    mutationFn: (range: TimeRange) => setRangeStatus(range, 'booked'),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['slots'] }),
   })
 }
 
-// Frees a slot after a booking was cancelled or moved. Mock only, like useBookSlot.
-export function useReleaseSlot() {
+export function useReleaseRange() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => slotsApi.update(id, { status: 'free' }),
+    mutationFn: (range: TimeRange) => setRangeStatus(range, 'free'),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['slots'] }),
   })
 }

@@ -34,6 +34,7 @@ export function BookingSummary({
         businessName: business.name,
         category: business.category,
         city: business.city,
+        address: business.address,
         imageUrl: business.imageUrl,
         serviceId: service.id,
         serviceName: service.name,

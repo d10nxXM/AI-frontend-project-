@@ -17,7 +17,7 @@ const DAYS = 14
 const DAY_MS = 24 * 60 * 60 * 1000
 
 // Slots already taken by the mock bookings in features/bookings.
-const bookedSlotIds = new Set([10001, 30111, 50300])
+const bookedSlotIds = new Set([10001, 10002, 30111, 50300])
 
 const pad = (n: number) => String(n).padStart(2, '0')
 

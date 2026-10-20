@@ -14,6 +14,7 @@ export type Booking = {
   serviceDescription: string
   price: number
   city: string
+  address: string
   startsAt: string
   durationMinutes: number
   status: BookingStatus
@@ -27,7 +28,14 @@ export type BookingChanges = Partial<Omit<Booking, 'id' | 'createdAt'>>
 
 // What the booking flow has picked so far; the bookings feature copies these into a NewBooking.
 export type BookingDraft = {
-  business: { id: number; name: string; category: Category; city: string; imageUrl: string }
+  business: {
+    id: number
+    name: string
+    category: Category
+    city: string
+    address: string
+    imageUrl: string
+  }
   service: { id: number; name: string; description: string; price: number; durationMinutes: number }
   slot: { id: number; startsAt: string }
 }

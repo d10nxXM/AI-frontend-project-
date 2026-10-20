@@ -7,7 +7,7 @@ import { useServices } from '../api/use-services'
 import type { Service } from '../types'
 
 const serviceVariants = cva(
-  'flex w-full items-start justify-between gap-4 p-4 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+  'flex w-full items-start justify-between gap-4 p-4 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring',
   {
     variants: {
       selected: { true: 'bg-muted', false: '' },

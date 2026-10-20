@@ -8,7 +8,7 @@ import type { Booking } from '@/features/bookings/types'
 import { BusinessDetail as BusinessInfo } from '@/features/businesses/components/business-detail'
 import { ServicesList } from '@/features/services/components/services-list'
 import type { Service } from '@/features/services/types'
-import { useBookSlot } from '@/features/slots/api/use-slots'
+import { useBookRange } from '@/features/slots/api/use-slots'
 import { SlotsByDay } from '@/features/slots/components/slots-by-day'
 import type { TimeSlot } from '@/features/slots/types'
 
@@ -16,21 +16,29 @@ import type { TimeSlot } from '@/features/slots/types'
 export function BusinessDetail() {
   const id = Number(useParams().id)
   const navigate = useNavigate()
-  const bookSlot = useBookSlot()
+  const bookRange = useBookRange()
   const [service, setService] = useState<Service>()
   const [slot, setSlot] = useState<TimeSlot>()
 
   if (!Number.isInteger(id) || id <= 0) return <NotFound />
 
-  // The real POST /bookings marks the slot itself; with the mock the route does it here.
+  // A different service has a different length, so the chosen time may no longer fit.
+  const chooseService = (next: Service) => {
+    setService(next)
+    setSlot(undefined)
+  }
+
+  // The real POST /bookings takes the slots itself; with the mock the route does it here.
   const handleBooked = (booking: Booking) =>
-    bookSlot.mutate(booking.slotId, { onSettled: () => navigate('/bookings') })
+    bookRange.mutate(booking, {
+      onSettled: () => navigate(`/bookings/${booking.id}`, { state: { justBooked: true } }),
+    })
 
   return (
     <section className="flex flex-col gap-8">
       <Link
         to="/businesses"
-        className="flex w-fit items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        className="flex w-fit items-center gap-2 rounded-sm text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring"
       >
         <ArrowLeft aria-hidden className="size-4" />
         All businesses
@@ -41,13 +49,19 @@ export function BusinessDetail() {
           <div className="flex min-w-0 flex-col gap-8">
             <div className="flex flex-col gap-4">
               <h2 className="text-xl font-semibold">1. Choose a service</h2>
-              <ServicesList businessId={id} selectedId={service?.id} onSelect={setService} />
+              <ServicesList businessId={id} selectedId={service?.id} onSelect={chooseService} />
             </div>
 
             <div className="flex flex-col gap-4">
               <h2 className="text-xl font-semibold">2. Choose a time</h2>
               {!service && <p className="text-sm text-muted-foreground">Choose a service first.</p>}
-              <SlotsByDay businessId={id} selectedId={slot?.id} onSelect={setSlot} disabled={!service} />
+              <SlotsByDay
+                businessId={id}
+                durationMinutes={service?.durationMinutes}
+                selectedId={slot?.id}
+                onSelect={setSlot}
+                disabled={!service}
+              />
             </div>
 
             <div className="flex flex-col gap-4">
@@ -56,7 +70,7 @@ export function BusinessDetail() {
                 business={business}
                 service={service}
                 slot={slot}
-                finishing={bookSlot.isPending}
+                finishing={bookRange.isPending}
                 onBooked={handleBooked}
               />
             </div>

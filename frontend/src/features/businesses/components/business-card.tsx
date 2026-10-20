@@ -19,9 +19,9 @@ export function BusinessCard({ business }: BusinessCardProps) {
   return (
     <Link
       to={`/businesses/${business.id}`}
-      className="block h-full rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      className="block h-full rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring"
     >
-      <Card className="flex h-full flex-row gap-4 overflow-hidden p-4 shadow-none transition-colors hover:border-foreground/30 sm:flex-col sm:gap-0 sm:p-0">
+      <Card className="flex h-full flex-row gap-4 overflow-hidden rounded-lg p-4 shadow-none transition-colors hover:border-foreground/30 sm:flex-col sm:gap-0 sm:p-0">
         {business.imageUrl ? (
           <img
             src={business.imageUrl}
@@ -42,9 +42,10 @@ export function BusinessCard({ business }: BusinessCardProps) {
           <h2 className="truncate text-base font-semibold sm:text-lg">{business.name}</h2>
           <p className="hidden text-sm text-muted-foreground sm:line-clamp-2">{business.description}</p>
           <div className="mt-auto flex flex-col gap-1 text-sm text-muted-foreground">
-            <span className="flex min-w-0 items-center gap-2">
-              <MapPin aria-hidden className="size-4 shrink-0" />
-              <span className="truncate">
+            <span className="flex min-w-0 items-start gap-2">
+            <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />
+            {/* Wraps instead of truncating, so the city at the end stays visible. */}
+            <span className="line-clamp-2">
                 {business.address}, {business.city}
               </span>
             </span>

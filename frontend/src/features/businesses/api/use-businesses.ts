@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import { NotFoundError } from '@/lib/mock-db'
 
@@ -9,6 +9,8 @@ export function useBusinesses(filter: BusinessFilter) {
   return useQuery({
     queryKey: ['businesses', filter],
     queryFn: () => businessesApi.list(filter),
+    // Keep showing the last results while a new filter loads, instead of skeletons.
+    placeholderData: keepPreviousData,
   })
 }
 
