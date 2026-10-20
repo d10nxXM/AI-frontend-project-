@@ -1,6 +1,7 @@
 import { Clock, MapPin } from 'lucide-react'
 import type { ReactNode } from 'react'
 
+import { DirectionsLink } from '@/components/directions-link'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { categoryIcons } from '@/lib/categories'
@@ -70,8 +71,11 @@ export function BusinessDetail({ id, children }: BusinessDetailProps) {
             <dt>
               <MapPin aria-label="Address" className="size-4 text-muted-foreground" />
             </dt>
-            <dd>
-              {business.address}, {business.city}
+            <dd className="flex flex-wrap items-center gap-x-2">
+              <span>
+                {business.address}, {business.city}
+              </span>
+              <DirectionsLink address={business.address} city={business.city} />
             </dd>
           </div>
           <div className="flex items-center gap-2">
