@@ -1,3 +1,5 @@
+import { useId } from 'react'
+
 import { Skeleton } from '@/components/ui/skeleton'
 import { localNow } from '@/lib/local-time'
 
@@ -14,6 +16,9 @@ type BookingsListProps = {
 export function BookingsList({ search, onCancelled }: BookingsListProps) {
   const { data: bookings, isLoading, error } = useBookings(search)
   const cancelBooking = useCancelBooking()
+  // Sections are named by their headings, so screen readers list them as regions.
+  const upcomingId = useId()
+  const pastId = useId()
 
   if (isLoading) {
     return (
@@ -68,8 +73,10 @@ export function BookingsList({ search, onCancelled }: BookingsListProps) {
         </p>
       )}
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold">Upcoming</h2>
+      <section aria-labelledby={upcomingId} className="flex flex-col gap-4">
+        <h2 id={upcomingId} className="text-xl font-semibold">
+          Upcoming
+        </h2>
         {upcoming.length > 0 ? (
           renderList(upcoming, false)
         ) : (
@@ -78,8 +85,10 @@ export function BookingsList({ search, onCancelled }: BookingsListProps) {
       </section>
 
       {earlier.length > 0 && (
-        <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold">Past and cancelled</h2>
+        <section aria-labelledby={pastId} className="flex flex-col gap-4">
+          <h2 id={pastId} className="text-xl font-semibold">
+            Past and cancelled
+          </h2>
           {renderList(earlier, true)}
         </section>
       )}
