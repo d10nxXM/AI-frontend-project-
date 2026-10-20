@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright MCP screenshots and snapshots
+.playwright-mcp
+
+# Playwright test output
+test-results
+playwright-report

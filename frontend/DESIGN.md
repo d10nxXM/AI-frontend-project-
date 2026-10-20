@@ -20,7 +20,8 @@ Simple, modern, professional.
   - Light mode: white background, near-black text, crimson red `primary`
     (`oklch(0.52 0.2 22)`, about `#C8102E`) for the main action
   - Dark mode (`.dark` class on `<html>`): near-black background (`oklch(0.14 0 0)`, not pure
-    `#000`), light text, a lighter red `primary` (`oklch(0.62 0.2 22)`) so it stays visible
+    `#000`), light text, a slightly lighter red `primary` (`oklch(0.56 0.2 22)`) so it stays visible on the dark
+    background while white text on it keeps at least 4.5:1
   - Everything else (muted, borders, inputs) is neutral gray with no hue
   - `destructive` is a darker, more orange red so errors and deletions are not confused with the
     primary action; destructive actions always also carry an icon and a text label

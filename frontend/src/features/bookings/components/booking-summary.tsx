@@ -1,0 +1,77 @@
+import { CalendarCheck, LoaderCircle } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+
+import { useCreateBooking } from '../api/use-bookings'
+import type { Booking, BookingDraft } from '../types'
+import { formatStartsAt } from './format-starts-at'
+
+type BookingSummaryProps = {
+  business: BookingDraft['business']
+  service?: BookingDraft['service']
+  slot?: BookingDraft['slot']
+  // True while the caller finishes up after the booking was created (e.g. marking the slot).
+  finishing?: boolean
+  onBooked: (booking: Booking) => void
+}
+
+// The last step: what is about to be booked and the one main action, "Book".
+export function BookingSummary({
+  business,
+  service,
+  slot,
+  finishing = false,
+  onBooked,
+}: BookingSummaryProps) {
+  const createBooking = useCreateBooking()
+  const pending = createBooking.isPending || finishing
+
+  function book() {
+    if (!service || !slot) return
+    createBooking.mutate(
+      {
+        businessId: business.id,
+        businessName: business.name,
+        category: business.category,
+        city: business.city,
+        address: business.address,
+        imageUrl: business.imageUrl,
+        serviceId: service.id,
+        serviceName: service.name,
+        serviceDescription: service.description,
+        price: service.price,
+        durationMinutes: service.durationMinutes,
+        slotId: slot.id,
+        startsAt: slot.startsAt,
+      },
+      { onSuccess: onBooked },
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-4 rounded-lg border p-4">
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+        <dt className="text-muted-foreground">Service</dt>
+        <dd>{service ? service.name : 'Not chosen yet'}</dd>
+        <dt className="text-muted-foreground">Time</dt>
+        <dd className="tabular-nums">{slot ? formatStartsAt(slot.startsAt) : 'Not chosen yet'}</dd>
+        <dt className="text-muted-foreground">Price</dt>
+        <dd className="font-semibold tabular-nums">{service ? `€${service.price}` : '–'}</dd>
+      </dl>
+
+      {createBooking.error && (
+        <p className="text-sm text-destructive">The booking failed. Please try again.</p>
+      )}
+
+      <Button
+        size="lg"
+        disabled={!service || !slot || pending}
+        onClick={book}
+        className="w-full sm:w-auto sm:self-end"
+      >
+        {pending ? <LoaderCircle aria-hidden className="animate-spin" /> : <CalendarCheck aria-hidden />}
+        {pending ? 'Booking…' : 'Book'}
+      </Button>
+    </div>
+  )
+}

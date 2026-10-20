@@ -8,6 +8,7 @@ export function Listings() {
 
   return (
     <section>
+      <title>Listings · Zakazi.me</title>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <h1 className="text-3xl font-bold">Listings</h1>
         <Input

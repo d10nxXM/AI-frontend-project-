@@ -1,6 +1,9 @@
 import { createBrowserRouter } from 'react-router'
 
+import { BookingDetail } from '@/app/routes/booking-detail'
 import { Bookings } from '@/app/routes/bookings'
+import { BusinessDetail } from '@/app/routes/business-detail'
+import { Businesses } from '@/app/routes/businesses'
 import { Home } from '@/app/routes/home'
 import { Listings } from '@/app/routes/listings'
 import { NotFound } from '@/app/routes/not-found'
@@ -12,7 +15,10 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <Home /> },
       { path: '/listings', element: <Listings /> },
+      { path: '/businesses', element: <Businesses /> },
+      { path: '/businesses/:id', element: <BusinessDetail /> },
       { path: '/bookings', element: <Bookings /> },
+      { path: '/bookings/:id', element: <BookingDetail /> },
       { path: '*', element: <NotFound /> },
     ],
   },

@@ -29,6 +29,10 @@ Code: `frontend/src/features/listings/` (`types.ts`, `api/listings-api.ts`, `api
 ## Booking
 
 Code: `frontend/src/features/bookings/` (`types.ts`, `api/bookings-api.ts`, `api/use-bookings.ts`).
+Booking flow on `/businesses/:id`: 1. choose a service, 2. choose a free time slot, 3. confirm with
+"Book" (`components/booking-summary.tsx`, `useCreateBooking`), then go to `/bookings`.
+Booking detail on `/bookings/:id`: details, "Cancel booking" and "Change time" (move to another free
+slot of the same business; `components/reschedule-confirm.tsx`, `useRescheduleBooking`).
 
 An appointment a client books at a business (hair salon, gym or service shop) for one service.
 
@@ -37,13 +41,14 @@ An appointment a client books at a business (hair salon, gym or service shop) fo
 | id | number | yes | assigned by the backend |
 | businessId | number | yes | the business the booking is at |
 | serviceId | number | yes | the booked service |
-| slotId | number | yes | the booked time slot; it becomes `booked` |
+| slotId | number | yes | the first booked time slot; every slot the duration covers becomes `booked` |
 | businessName | string | yes | copied from the business |
 | category | `hair` \| `gym` \| `service` | yes | copied from the business |
 | serviceName | string | yes | copied from the service at booking time |
 | serviceDescription | string | yes | copied from the service at booking time |
 | price | number ≥ 0, EUR | yes | copied from the service at booking time |
 | city | string | yes | copied from the business |
+| address | string | yes | copied from the business |
 | startsAt | local date-time, `YYYY-MM-DDTHH:mm` | yes | 24-hour time |
 | durationMinutes | number > 0 | yes | |
 | status | `booked` \| `cancelled` | yes | set to `booked` by the backend on create |
@@ -52,13 +57,15 @@ An appointment a client books at a business (hair salon, gym or service shop) fo
 
 **Relations:** a booking belongs to one client (the user who booked it), one business, one service and one time slot. The copied fields keep the booking readable even if the service changes later.
 
-**Access rules:** cancelling a booking sets its time slot back to `free`; a client sees and cancels only their own bookings; a business owner sees the bookings for their business; only a signed-in user can create a booking.
+**Access rules:** a booking needs consecutive free slots covering the service duration (e.g. 120 min = four 30 min slots); creating a booking sets all of those slots to `booked` (the backend does this in `POST /bookings`; the mock does it from the frontend with `useBookRange`); cancelling a booking sets its slots back to `free`; only upcoming bookings (not cancelled, not in the past) can be moved or cancelled; moving a booking frees its old slots and books the new ones (the new time must fit in free slots of the same business, its own old slots count as free; the mock does the swap with `useReleaseRange` and `useBookRange`); a client sees and cancels only their own bookings; a business owner sees the bookings for their business; only a signed-in user can create a booking.
 
-**API the frontend expects:** `GET /bookings?search=`, `GET /bookings/:id`, `POST /bookings`, `PATCH /bookings/:id` (cancel = `{ "status": "cancelled" }`), `DELETE /bookings/:id`.
+**API the frontend expects:** `GET /bookings?search=`, `GET /bookings/:id`, `POST /bookings`, `PATCH /bookings/:id` (cancel = `{ "status": "cancelled" }`, move = `{ "slotId": 10012, "startsAt": "2026-10-20T12:30" }`), `DELETE /bookings/:id`.
 
 ## Business
 
-Code: `frontend/src/features/businesses/` (`types.ts`, `api/businesses-api.ts`, `api/use-businesses.ts`).
+Code: `frontend/src/features/businesses/` (`types.ts`, `api/businesses-api.ts`, `api/use-businesses.ts`,
+`components/` for the list, card, filters and detail). Pages: `/businesses` (search, category and city
+filters) and `/businesses/:id` (cover, info, free slots by day and services).
 The `Category` type is shared in `frontend/src/lib/categories.ts`.
 
 A hair salon, gym or service shop that publishes services and free time slots.

@@ -1,22 +1,30 @@
+import { useId } from 'react'
+
 import { Skeleton } from '@/components/ui/skeleton'
+import { localNow } from '@/lib/local-time'
 
 import { useBookings, useCancelBooking } from '../api/use-bookings'
+import type { Booking } from '../types'
 import { BookingCard } from './booking-card'
 
 type BookingsListProps = {
   search: string
+  onCancelled?: (booking: Booking) => void
 }
 
-// Bookings with all three states: loading, empty and error.
-export function BookingsList({ search }: BookingsListProps) {
+// Upcoming bookings first, then past and cancelled ones; with loading, empty and error states.
+export function BookingsList({ search, onCancelled }: BookingsListProps) {
   const { data: bookings, isLoading, error } = useBookings(search)
   const cancelBooking = useCancelBooking()
+  // Sections are named by their headings, so screen readers list them as regions.
+  const upcomingId = useId()
+  const pastId = useId()
 
   if (isLoading) {
     return (
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton key={i} className="h-96" />
+          <Skeleton key={i} className="h-36 sm:h-96" />
         ))}
       </div>
     )
@@ -34,24 +42,56 @@ export function BookingsList({ search }: BookingsListProps) {
     )
   }
 
+  const now = localNow()
+  const isUpcoming = (b: Booking) => b.status === 'booked' && b.startsAt >= now
+  const upcoming = bookings.filter(isUpcoming)
+  const earlier = bookings.filter((b) => !isUpcoming(b)).reverse()
+
+  const cancel = (booking: Booking) =>
+    cancelBooking.mutate(booking.id, { onSuccess: () => onCancelled?.(booking) })
+
+  const renderList = (list: Booking[], past: boolean) => (
+    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+      {list.map((booking) => (
+        <li key={booking.id}>
+          <BookingCard
+            booking={booking}
+            past={past}
+            onCancel={cancel}
+            isCancelling={cancelBooking.isPending && cancelBooking.variables === booking.id}
+          />
+        </li>
+      ))}
+    </ul>
+  )
+
   return (
-    <>
+    <div className="mt-8 flex flex-col gap-8">
       {cancelBooking.isError && (
-        <p role="alert" className="mt-8 text-destructive">
+        <p role="alert" className="text-destructive">
           The booking could not be cancelled. Please try again.
         </p>
       )}
-      <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {bookings.map((booking) => (
-          <li key={booking.id}>
-            <BookingCard
-              booking={booking}
-              onCancel={cancelBooking.mutate}
-              isCancelling={cancelBooking.isPending && cancelBooking.variables === booking.id}
-            />
-          </li>
-        ))}
-      </ul>
-    </>
+
+      <section aria-labelledby={upcomingId} className="flex flex-col gap-4">
+        <h2 id={upcomingId} className="text-xl font-semibold">
+          Upcoming
+        </h2>
+        {upcoming.length > 0 ? (
+          renderList(upcoming, false)
+        ) : (
+          <p className="text-muted-foreground">No upcoming bookings.</p>
+        )}
+      </section>
+
+      {earlier.length > 0 && (
+        <section aria-labelledby={pastId} className="flex flex-col gap-4">
+          <h2 id={pastId} className="text-xl font-semibold">
+            Past and cancelled
+          </h2>
+          {renderList(earlier, true)}
+        </section>
+      )}
+    </div>
   )
 }
