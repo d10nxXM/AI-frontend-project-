@@ -3,10 +3,11 @@ import { CalendarClock, Dumbbell, MapPin, Scissors, Wrench, XCircle } from 'luci
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Category } from '@/lib/categories'
 
-import type { Booking, BookingCategory, BookingStatus } from '../types'
+import type { Booking, BookingStatus } from '../types'
 
-const categoryIcons: Record<BookingCategory, typeof Scissors> = {
+const categoryIcons: Record<Category, typeof Scissors> = {
   hair: Scissors,
   gym: Dumbbell,
   service: Wrench,
@@ -39,7 +40,11 @@ export function BookingCard({ booking, onCancel, isCancelling }: BookingCardProp
 
   return (
     <Card className="h-full overflow-hidden pt-0 shadow-none">
-      <img src={booking.imageUrl} alt={booking.businessName} className="aspect-video w-full bg-muted object-cover" />
+      <img
+        src={booking.imageUrl}
+        alt={booking.businessName}
+        className="aspect-video w-full bg-muted object-cover"
+      />
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 text-sm text-muted-foreground">

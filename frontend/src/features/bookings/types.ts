@@ -1,12 +1,15 @@
-export type BookingCategory = 'hair' | 'gym' | 'service'
+import type { Category } from '@/lib/categories'
 
 export type BookingStatus = 'booked' | 'cancelled'
 
 // An appointment a client booked at a business for one service.
 export type Booking = {
   id: number
+  businessId: number
+  serviceId: number
+  slotId: number
   businessName: string
-  category: BookingCategory
+  category: Category
   serviceName: string
   serviceDescription: string
   price: number

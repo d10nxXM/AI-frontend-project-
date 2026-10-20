@@ -5,6 +5,9 @@ import type { Booking, BookingChanges, NewBooking } from '../types'
 let bookings: Booking[] = [
   {
     id: 1,
+    businessId: 1,
+    serviceId: 1,
+    slotId: 10001,
     businessName: 'Studio Lana',
     category: 'hair',
     serviceName: "Women's haircut and blow-dry",
@@ -19,6 +22,9 @@ let bookings: Booking[] = [
   },
   {
     id: 2,
+    businessId: 3,
+    serviceId: 6,
+    slotId: 30111,
     businessName: 'Iron Gym',
     category: 'gym',
     serviceName: 'Personal training session',
@@ -33,6 +39,9 @@ let bookings: Booking[] = [
   },
   {
     id: 3,
+    businessId: 5,
+    serviceId: 10,
+    slotId: 50300,
     businessName: 'AutoServis Delta',
     category: 'service',
     serviceName: 'Oil and filter change',
@@ -47,13 +56,16 @@ let bookings: Booking[] = [
   },
   {
     id: 4,
+    businessId: 2,
+    serviceId: 4,
+    slotId: 20216,
     businessName: 'Barber Shop Kruna',
     category: 'hair',
     serviceName: "Men's haircut and beard trim",
     serviceDescription: 'Clipper and scissor cut with a hot towel beard trim.',
     price: 15,
     city: 'Podgorica',
-    startsAt: '2026-10-18T16:30',
+    startsAt: '2026-10-22T17:00',
     durationMinutes: 40,
     status: 'cancelled',
     imageUrl: 'https://picsum.photos/seed/zakazi-kruna/600/338',
