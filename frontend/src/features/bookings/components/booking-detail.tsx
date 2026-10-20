@@ -33,10 +33,12 @@ type BookingDetailProps = {
   onCancelled?: (booking: Booking) => void
   // Extra actions for an upcoming booking (e.g. moving it), rendered next to the details.
   children?: (booking: Booking) => ReactNode
+  // Shown under the details of a past (not cancelled) booking, e.g. a review form.
+  pastActions?: (booking: Booking) => ReactNode
 }
 
 // One booking with loading, not-found and error states; an upcoming one can be cancelled.
-export function BookingDetail({ id, onCancelled, children }: BookingDetailProps) {
+export function BookingDetail({ id, onCancelled, children, pastActions }: BookingDetailProps) {
   const { data: booking, isLoading, error } = useBooking(id)
   const cancelBooking = useCancelBooking()
 
@@ -146,6 +148,7 @@ export function BookingDetail({ id, onCancelled, children }: BookingDetailProps)
             The booking could not be cancelled. Please try again.
           </p>
         )}
+        {!upcoming && !cancelled && pastActions?.(booking)}
         {cancelled && (
           <p role="status" className="text-sm">
             This booking is cancelled.

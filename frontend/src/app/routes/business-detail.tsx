@@ -7,6 +7,8 @@ import { BookingSummary } from '@/features/bookings/components/booking-summary'
 import { ClientDetailsForm } from '@/features/bookings/components/client-details-form'
 import type { Booking, ClientDetails } from '@/features/bookings/types'
 import { BusinessDetail as BusinessInfo } from '@/features/businesses/components/business-detail'
+import { RatingSummary } from '@/features/reviews/components/rating-summary'
+import { ReviewsList } from '@/features/reviews/components/reviews-list'
 import { ServicesList } from '@/features/services/components/services-list'
 import type { Service } from '@/features/services/types'
 import { useBookRange } from '@/features/slots/api/use-slots'
@@ -56,7 +58,7 @@ export function BusinessDetail() {
         All businesses
       </Link>
 
-      <BusinessInfo id={id}>
+      <BusinessInfo id={id} summary={(business) => <RatingSummary businessId={business.id} />}>
         {(business) => (
           <div className="flex min-w-0 flex-col gap-8">
             <div className="flex flex-col gap-4">
@@ -98,6 +100,13 @@ export function BusinessDetail() {
                 onBooked={handleBooked}
               />
             </div>
+
+            <section aria-labelledby="business-reviews" className="flex flex-col gap-4">
+              <h2 id="business-reviews" className="text-xl font-semibold">
+                Reviews
+              </h2>
+              <ReviewsList businessId={business.id} />
+            </section>
           </div>
         )}
       </BusinessInfo>

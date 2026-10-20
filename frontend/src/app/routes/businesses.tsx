@@ -5,6 +5,7 @@ import { BusinessFilters } from '@/features/businesses/components/business-filte
 import { BusinessesList } from '@/features/businesses/components/businesses-list'
 import { useFavorites } from '@/features/businesses/hooks/use-favorites'
 import type { Business, BusinessFilter } from '@/features/businesses/types'
+import { RatingInline } from '@/features/reviews/components/rating-inline'
 import { useSlots } from '@/features/slots/api/use-slots'
 import { NextFreeTime } from '@/features/slots/components/next-free-time'
 import { isCategory } from '@/lib/categories'
@@ -79,7 +80,12 @@ export function Businesses() {
         onClearFilters={() => setUrl({}, { freeToday: false, favoritesOnly: false })}
         include={include}
         waiting={toggles.freeToday && freeSlotsToday.isLoading}
-        renderExtra={(business) => <NextFreeTime businessId={business.id} />}
+        renderExtra={(business) => (
+          <>
+            <RatingInline businessId={business.id} />
+            <NextFreeTime businessId={business.id} />
+          </>
+        )}
         emptyMessage={
           toggles.favoritesOnly && favorites.ids.size === 0
             ? 'No favorites yet. Tap the heart on a business to save it.'

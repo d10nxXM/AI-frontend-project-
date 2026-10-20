@@ -6,6 +6,7 @@ import { NotFound } from '@/app/routes/not-found'
 import { BookingDetail as BookingInfo } from '@/features/bookings/components/booking-detail'
 import { RescheduleConfirm } from '@/features/bookings/components/reschedule-confirm'
 import type { Booking } from '@/features/bookings/types'
+import { ReviewForm } from '@/features/reviews/components/review-form'
 import { useBookRange, useReleaseRange } from '@/features/slots/api/use-slots'
 import { SlotsByDay } from '@/features/slots/components/slots-by-day'
 import type { TimeSlot } from '@/features/slots/types'
@@ -57,6 +58,15 @@ export function BookingDetail() {
 
       <BookingInfo
         id={id}
+        pastActions={(booking) => (
+          <ReviewForm
+            booking={{
+              businessId: booking.businessId,
+              bookingId: booking.id,
+              clientName: booking.clientName,
+            }}
+          />
+        )}
         onCancelled={(booking) => {
           setMessage('')
           releaseRange.mutate(booking)
