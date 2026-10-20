@@ -50,10 +50,13 @@ export function BookingCard({ booking, past, onCancel, isCancelling }: BookingCa
           </Link>
         </h3>
         {/* The time is what matters most on a booking, so it is the strongest line. */}
-        <span className="flex items-center gap-2 text-base font-semibold tabular-nums">
+        {/* Date-time and duration each stay on one line; only the whole duration may wrap. */}
+        <span className="flex flex-wrap items-center gap-x-2 text-base font-semibold tabular-nums">
           <CalendarClock aria-hidden className="size-4 shrink-0 text-muted-foreground" />
-          {formatStartsAt(booking.startsAt)}
-          <span className="font-normal text-muted-foreground">· {booking.durationMinutes} min</span>
+          <span className="whitespace-nowrap">{formatStartsAt(booking.startsAt)}</span>
+          <span className="font-normal whitespace-nowrap text-muted-foreground">
+            · {booking.durationMinutes} min
+          </span>
         </span>
         <span className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin aria-hidden className="size-4 shrink-0" />
