@@ -8,10 +8,12 @@ import { BusinessCard } from './business-card'
 type BusinessesListProps = {
   filter: BusinessFilter
   onClearFilters?: () => void
+  // Show only the first few (e.g. on the home page).
+  limit?: number
 }
 
 // Businesses with all three states: loading, empty and error.
-export function BusinessesList({ filter, onClearFilters }: BusinessesListProps) {
+export function BusinessesList({ filter, onClearFilters, limit }: BusinessesListProps) {
   const { data: businesses, isLoading, error } = useBusinesses(filter)
 
   if (isLoading) {
@@ -43,7 +45,7 @@ export function BusinessesList({ filter, onClearFilters }: BusinessesListProps) 
 
   return (
     <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-      {businesses.map((business) => (
+      {businesses.slice(0, limit).map((business) => (
         <li key={business.id}>
           <BusinessCard business={business} />
         </li>

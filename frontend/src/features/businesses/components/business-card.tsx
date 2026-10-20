@@ -43,9 +43,9 @@ export function BusinessCard({ business }: BusinessCardProps) {
           <p className="hidden text-sm text-muted-foreground sm:line-clamp-2">{business.description}</p>
           <div className="mt-auto flex flex-col gap-1 text-sm text-muted-foreground">
             <span className="flex min-w-0 items-start gap-2">
-            <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {/* Wraps instead of truncating, so the city at the end stays visible. */}
-            <span className="line-clamp-2">
+              <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" />
+              {/* Wraps instead of truncating, so the city at the end stays visible. */}
+              <span className="line-clamp-2">
                 {business.address}, {business.city}
               </span>
             </span>

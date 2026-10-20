@@ -2,7 +2,7 @@ import { expect, horizontalOverflow, test } from './fixtures.ts'
 
 // Each page with a text that only shows once its data has loaded.
 const pages = [
-  { path: '/', ready: 'Zakazi.me' },
+  { path: '/', ready: 'Browse by category' },
   { path: '/businesses', ready: 'iFix Niksic' },
   { path: '/businesses/1', ready: 'Full colour' },
   { path: '/bookings', ready: 'Personal training session' },

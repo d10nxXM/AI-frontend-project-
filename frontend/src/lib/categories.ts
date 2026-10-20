@@ -9,3 +9,7 @@ export const categoryIcons: Record<Category, typeof Scissors> = {
   gym: Dumbbell,
   service: Wrench,
 }
+
+// Narrows any string (e.g. from the URL) to a Category.
+export const isCategory = (value: string | null): value is Category =>
+  value !== null && value in categoryIcons
