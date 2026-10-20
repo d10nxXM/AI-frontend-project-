@@ -58,7 +58,8 @@ An appointment a client books at a business (hair salon, gym or service shop) fo
 
 ## Business
 
-Code: `frontend/src/features/businesses/` (`types.ts`, `api/businesses-api.ts`, `api/use-businesses.ts`).
+Code: `frontend/src/features/businesses/` (`types.ts`, `api/businesses-api.ts`, `api/use-businesses.ts`,
+`components/` for the list, card and filters). Page: `/businesses` (search, category and city filters).
 The `Category` type is shared in `frontend/src/lib/categories.ts`.
 
 A hair salon, gym or service shop that publishes services and free time slots.

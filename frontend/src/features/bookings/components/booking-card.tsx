@@ -1,17 +1,11 @@
-import { CalendarClock, Dumbbell, MapPin, Scissors, Wrench, XCircle } from 'lucide-react'
+import { CalendarClock, MapPin, XCircle } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Category } from '@/lib/categories'
+import { categoryIcons } from '@/lib/categories'
 
 import type { Booking, BookingStatus } from '../types'
-
-const categoryIcons: Record<Category, typeof Scissors> = {
-  hair: Scissors,
-  gym: Dumbbell,
-  service: Wrench,
-}
 
 // Status is always shown as text, never by color alone (DESIGN.md).
 const statusBadges: Record<BookingStatus, { label: string; variant: 'outline' | 'secondary' }> = {
