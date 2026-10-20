@@ -5,6 +5,7 @@ Design is described in @DESIGN.md, entities in @../docs/entities.md.
 All paths below are relative to `frontend/`.
 
 ## Feature-first
+
 Every feature (listings, users, messages…) lives in `src/features/<name>/` and has only the
 subfolders it needs: `api/`, `components/`, `hooks/`, `types.ts`. Features do not import each
 other; a route in `src/app/routes/` combines them on one page. Shared code goes to
@@ -12,17 +13,22 @@ other; a route in `src/app/routes/` combines them on one page. Shared code goes 
 Dependency direction: shared code -> features -> app, never the other way around.
 
 ## Structure
+
 - `src/app/router.tsx`: all routes; `src/app/providers.tsx`: global providers (TanStack Query)
 - `src/app/routes/`: one file per route, only combines features and layout
 - `src/features/<name>/types.ts`: entity types of that feature
 - `src/features/<name>/api/<name>-api.ts`: the only place that fetches data (mock for now)
 - `src/features/<name>/api/use-<name>.ts`: TanStack Query hooks around the API
 - `src/features/<name>/components/`: components of that feature (e.g. `listing-card.tsx`)
-- `src/components/ui/`: shadcn/ui components, added with `pnpm dlx shadcn@latest add <name>` (run inside `frontend/`)
+- `src/components/ui/`: shadcn/ui components, added with `pnpm dlx shadcn@latest add <name>` (run inside `frontend/`).
+  Since September 2026 the CLI writes `import { cn } from "cn"` and installs the `cn` package for that
+  component: that is correct, keep it (pin the exact version). Older components and our own code import
+  `cn` from `@/lib/utils`.
 - `src/components/layout/`: app layout (header, navigation)
 - `src/lib/`: `utils.ts` (`cn`) and `mock-db.ts` (mock database and delay)
 
 ## Rules
+
 - A feature never imports another feature; `src/components` and `src/lib` never import from `src/features` or `src/app`
 - No barrel `index.ts` files: import the file directly (`@/features/listings/components/listings-list`)
 - Components and routes never call `*-api.ts` directly, only through a hook from `use-<name>.ts`
@@ -33,6 +39,7 @@ Dependency direction: shared code -> features -> app, never the other way around
 - If you are not sure how a library API works (Tailwind v4, React Router 8, TanStack Query 5), check the docs via Context7, do not guess.
 
 ## Done when
+
 - `pnpm typecheck` and `pnpm lint` pass
 - The page was opened with Playwright MCP and screenshots at 375 px and 1440 px match DESIGN.md
 - No errors in the browser console
