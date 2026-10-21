@@ -14,6 +14,14 @@ export function useBookings(search: string) {
   })
 }
 
+// All bookings at one business, for its owner's dashboard.
+export function useBusinessBookings(businessId: number) {
+  return useQuery({
+    queryKey: ['bookings', { businessId }],
+    queryFn: () => bookingsApi.list('', businessId),
+  })
+}
+
 export function useBooking(id: number) {
   return useQuery({
     queryKey: ['bookings', id],

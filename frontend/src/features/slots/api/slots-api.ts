@@ -47,6 +47,9 @@ function generateSlots() {
 
 let slots = generateSlots()
 
+// Counts up from now, so slots published in one batch (the same millisecond) get distinct ids.
+let nextId = Date.now()
+
 const matches = (slot: TimeSlot, { businessId, date, status }: SlotFilter) =>
   (businessId === undefined || slot.businessId === businessId) &&
   (!date || slot.startsAt.startsWith(date)) &&
@@ -62,7 +65,7 @@ export const slotsApi = {
   },
 
   create: (input: NewTimeSlot) => {
-    const slot: TimeSlot = { ...input, id: Date.now(), status: 'free' }
+    const slot: TimeSlot = { ...input, id: nextId++, status: 'free' }
     slots = [...slots, slot].sort((a, b) => a.startsAt.localeCompare(b.startsAt))
     return delay(slot)
   },
