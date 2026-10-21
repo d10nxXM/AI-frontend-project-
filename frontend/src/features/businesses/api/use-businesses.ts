@@ -1,8 +1,8 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { NotFoundError } from '@/lib/mock-db'
 
-import type { BusinessFilter } from '../types'
+import type { BusinessFilter, NewBusiness } from '../types'
 import { businessesApi } from './businesses-api'
 
 export function useBusinesses(filter: BusinessFilter) {
@@ -20,5 +20,14 @@ export function useBusiness(id: number) {
     queryFn: () => businessesApi.get(id),
     // A missing business will not appear on retry, so show the not-found state right away.
     retry: (failureCount, error) => !(error instanceof NotFoundError) && failureCount < 3,
+  })
+}
+
+export function useUpdateBusiness() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, changes }: { id: number; changes: Partial<NewBusiness> }) =>
+      businessesApi.update(id, changes),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['businesses'] }),
   })
 }

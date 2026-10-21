@@ -93,8 +93,14 @@ const matches = (booking: Booking, search: string) =>
   )
 
 export const bookingsApi = {
-  list: (search = '') =>
-    delay(bookings.filter((b) => matches(b, search)).sort((a, b) => a.startsAt.localeCompare(b.startsAt))),
+  // businessId narrows to one business for its owner's dashboard. Display only: the real
+  // GET /bookings scopes to the caller's own bookings or businesses whatever is sent.
+  list: (search = '', businessId?: number) =>
+    delay(
+      bookings
+        .filter((b) => matches(b, search) && (businessId === undefined || b.businessId === businessId))
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
+    ),
 
   get: (id: number) => {
     const booking = bookings.find((b) => b.id === id)

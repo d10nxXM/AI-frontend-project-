@@ -4,6 +4,8 @@ What the client side already has, what you can reuse for the owner features (Gro
 missing. Read this together with `CLAUDE.md`, `frontend/CLAUDE.md`, `frontend/DESIGN.md` and
 `docs/entities.md` (the contract with the coming backend).
 
+> The owner side (Group B) is built now: see `docs/handoff-owner.md`.
+
 ## Start here
 
 ```bash

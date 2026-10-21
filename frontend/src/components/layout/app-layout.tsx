@@ -7,6 +7,7 @@ const links = [
   { to: '/', label: 'Home' },
   { to: '/businesses', label: 'Businesses' },
   { to: '/bookings', label: 'Bookings' },
+  { to: '/owner', label: 'For business' },
 ]
 
 export function AppLayout() {
