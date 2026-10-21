@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useState } from 'react'
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -42,7 +42,10 @@ type OwnerScheduleProps = {
 
 // The owner's published slots by day or by week; free future slots can be deleted.
 export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleProps) {
+  const headingId = useId()
   const [mode, setMode] = useState<Mode>('day')
+  const [message, setMessage] = useState('')
+  const messageRef = useRef<HTMLParagraphElement>(null)
   const { data: slots, isLoading, error } = useSlots({ businessId })
   const deleteSlot = useDeleteSlot()
 
@@ -57,7 +60,24 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
 
   const slotsOn = (day: string) => (slots ?? []).filter((s) => s.startsAt.startsWith(day))
 
-  const remove = (slot: TimeSlot) => deleteSlot.mutate(slot.id)
+  // The deleted row and its button are gone, so focus moves to the confirmation instead.
+  useEffect(() => {
+    if (message) messageRef.current?.focus()
+  }, [message])
+
+  const remove = (slot: TimeSlot) => {
+    setMessage('')
+    deleteSlot.mutate(slot.id, {
+      onSuccess: () => setMessage(`${formatDay(date)}, ${slot.startsAt.slice(11, 16)} deleted.`),
+    })
+  }
+
+  // Messages are about the day they happened on, so they go when another day is shown.
+  const changeDate = (next: string) => {
+    setMessage('')
+    deleteSlot.reset()
+    onDateChange(next)
+  }
 
   function body() {
     if (isLoading) {
@@ -93,7 +113,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
             const state = stateOf(slot)
             const time = slot.startsAt.slice(11, 16)
             return (
-              <li key={slot.id} className="flex items-center gap-4 px-4 py-3">
+              <li key={slot.id} className="flex min-h-14 items-center gap-4 px-4 py-2">
                 <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 tabular-nums">
                   <span className="font-semibold">{time}</span>
                   <span className="text-sm text-muted-foreground">{slot.durationMinutes} min</span>
@@ -132,18 +152,18 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
               <button
                 type="button"
                 onClick={() => {
-                  onDateChange(day)
+                  changeDate(day)
                   setMode('day')
                 }}
                 aria-label={`${formatDay(day)}: ${free} free, ${booked} booked. Open day`}
                 className="flex flex-col items-start rounded-sm text-left outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring"
               >
                 <span className="font-semibold tabular-nums">{formatDay(day)}</span>
-                {/* "Today" sits on the small line, so every day header stays one line high. */}
                 <span className="text-xs text-muted-foreground tabular-nums">
-                  {day === today && <span className="font-semibold text-foreground">Today · </span>}
                   {free} free · {booked} booked
                 </span>
+                {/* Every header has this line, empty on other days, so the columns stay level. */}
+                <span className="min-h-4 text-xs font-semibold">{day === today ? 'Today' : ''}</span>
               </button>
               {daySlots.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No slots</p>
@@ -168,9 +188,9 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
   }
 
   return (
-    <section aria-labelledby="owner-schedule" className="flex flex-col gap-4">
+    <section aria-labelledby={headingId} className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <h2 id="owner-schedule" className="text-xl font-semibold">
+        <h2 id={headingId} className="text-xl font-semibold">
           Schedule
         </h2>
         <div className="flex flex-wrap items-center gap-2">
@@ -191,7 +211,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onDateChange(today)}
+            onClick={() => changeDate(today)}
             disabled={days.includes(today)}
           >
             Today
@@ -204,7 +224,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
           variant="outline"
           size="icon"
           aria-label={mode === 'day' ? 'Previous day' : 'Previous week'}
-          onClick={() => onDateChange(addDays(date, -step))}
+          onClick={() => changeDate(addDays(date, -step))}
         >
           <ChevronLeft aria-hidden />
         </Button>
@@ -215,12 +235,23 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
           variant="outline"
           size="icon"
           aria-label={mode === 'day' ? 'Next day' : 'Next week'}
-          onClick={() => onDateChange(addDays(date, step))}
+          onClick={() => changeDate(addDays(date, step))}
         >
           <ChevronRight aria-hidden />
         </Button>
       </div>
 
+      {message && (
+        <p
+          ref={messageRef}
+          tabIndex={-1}
+          role="status"
+          className="flex items-center gap-2 rounded-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring"
+        >
+          <Check aria-hidden className="size-4 shrink-0" />
+          {message}
+        </p>
+      )}
       {deleteSlot.isError && (
         <p role="alert" className="text-destructive">
           {deleteSlot.error instanceof SlotBookedError

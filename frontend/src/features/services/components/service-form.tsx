@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useId } from 'react'
+import { useEffect, useId } from 'react'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
 
@@ -27,6 +27,7 @@ export function ServiceForm({ service, pending, onSubmit, onCancel }: ServiceFor
   const {
     register,
     handleSubmit,
+    setFocus,
     formState: { errors },
   } = useForm<ServiceFormValues, unknown, ServiceInput>({
     resolver: zodResolver(serviceSchema),
@@ -41,6 +42,9 @@ export function ServiceForm({ service, pending, onSubmit, onCancel }: ServiceFor
       durationMinutes: service ? String(service.durationMinutes) : '',
     },
   })
+
+  // The form replaces the button that opened it, so focus moves into it.
+  useEffect(() => setFocus('name'), [setFocus])
 
   const errorId = (field: keyof ServiceFormValues) => (errors[field] ? `${id}-${field}-error` : undefined)
   const errorText = (field: keyof ServiceFormValues) =>
@@ -88,7 +92,7 @@ export function ServiceForm({ service, pending, onSubmit, onCancel }: ServiceFor
           <Input
             id={`${id}-price`}
             inputMode="decimal"
-            placeholder="25"
+            placeholder="e.g. 25"
             className="tabular-nums"
             aria-invalid={Boolean(errors.price)}
             aria-describedby={errorId('price')}
@@ -100,7 +104,7 @@ export function ServiceForm({ service, pending, onSubmit, onCancel }: ServiceFor
           <Input
             id={`${id}-durationMinutes`}
             inputMode="numeric"
-            placeholder="60"
+            placeholder="e.g. 60"
             className="tabular-nums"
             aria-invalid={Boolean(errors.durationMinutes)}
             aria-describedby={errorId('durationMinutes')}

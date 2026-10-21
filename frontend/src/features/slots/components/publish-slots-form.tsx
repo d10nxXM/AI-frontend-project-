@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CalendarPlus } from 'lucide-react'
-import { useId, useState } from 'react'
+import { type ComponentProps, useId, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
@@ -10,10 +10,18 @@ import { localNow } from '@/lib/local-time'
 
 import { usePublishSlots } from '../api/use-slots'
 import { publishSlotsSchema, slotLengths } from './publish-slots-schema'
+import { formatDay } from './schedule-dates'
 
 // Looks like the Input component, for the native select.
 const selectClassName =
   'h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base tabular-nums shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm dark:bg-background'
+
+// Every quarter hour as HH:mm. Native time inputs follow the browser's language and may show
+// AM/PM; a select keeps the app's 24-hour clock everywhere.
+const quarterHours = Array.from(
+  { length: 96 },
+  (_, i) => `${String(Math.floor(i / 4)).padStart(2, '0')}:${String((i % 4) * 15).padStart(2, '0')}`,
+)
 
 const plural = (n: number) => (n === 1 ? 'time slot' : 'time slots')
 
@@ -37,6 +45,7 @@ export function PublishSlotsForm({ businessId, onPublished }: PublishSlotsFormPr
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(publishSlotsSchema),
@@ -47,6 +56,10 @@ export function PublishSlotsForm({ businessId, onPublished }: PublishSlotsFormPr
     // slotLengths[1] is 30 min, typed as one of the offered lengths.
     defaultValues: { date: localNow().slice(0, 10), from: '09:00', to: '17:00', slotMinutes: slotLengths[1] },
   })
+
+  // The date input follows the browser's language too, so the day is also written the app's way.
+  const date = watch('date')
+  const dayLabel = /^\d{4}-\d{2}-\d{2}$/.test(date) && !errors.date ? formatDay(date) : ''
 
   const submit = handleSubmit((values) => {
     setMessage('')
@@ -87,16 +100,17 @@ export function PublishSlotsForm({ businessId, onPublished }: PublishSlotsFormPr
             {...field('date')}
             {...register('date')}
           />
+          {dayLabel && <p className="text-sm text-muted-foreground tabular-nums">{dayLabel}</p>}
           {error('date')}
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor={`${id}-from`}>From</Label>
-          <Input type="time" className="tabular-nums" {...field('from')} {...register('from')} />
+          <TimeSelect {...field('from')} {...register('from')} />
           {error('from')}
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor={`${id}-to`}>To</Label>
-          <Input type="time" className="tabular-nums" {...field('to')} {...register('to')} />
+          <TimeSelect {...field('to')} {...register('to')} />
           {error('to')}
         </div>
         <div className="col-span-2 flex flex-col gap-2 lg:col-span-1">
@@ -126,5 +140,17 @@ export function PublishSlotsForm({ businessId, onPublished }: PublishSlotsFormPr
         {message}
       </p>
     </form>
+  )
+}
+
+function TimeSelect(props: ComponentProps<'select'>) {
+  return (
+    <select className={selectClassName} {...props}>
+      {quarterHours.map((time) => (
+        <option key={time} value={time}>
+          {time}
+        </option>
+      ))}
+    </select>
   )
 }

@@ -12,7 +12,7 @@ pnpm install
 pnpm --filter frontend exec playwright install chromium   # once per computer, for the browser tests
 pnpm dev                                                  # http://localhost:5173, owner side at /owner
 pnpm typecheck && pnpm lint && pnpm build
-pnpm test && pnpm test:e2e                                # 67 unit tests, 156 browser tests
+pnpm test && pnpm test:e2e                                # 68 unit tests, 156 browser tests
 ```
 
 ## What the owner side does
@@ -72,8 +72,10 @@ slots; `addDays`, `weekStart`, `weekDays`, `formatDay` in `features/slots/compon
 - **Services:** deleting a service that has upcoming bookings gives no warning (the bookings keep their copies).
 - **Profile:** the photo is a link, no upload; no list of cities to choose from.
 - **Reviews:** owners can read them on the public page; "reply" and "report" are not built.
-- **Not run yet on the owner side:** `security-reviewer` and `ui-reviewer`. The pages were checked by hand with
-  Playwright at 375 px and 1440 px.
+- **Left from the reviews:** the dashboard route still frees the slots after a cancel (`useReleaseRange`), the same
+  way the client's `bookings.tsx` does; it goes away when the backend frees them. `--accent` in `index.css` is tinted
+  red, so outline buttons turn reddish on hover (older than the owner side). The publish form's Day still starts on
+  today late in the evening.
 
 ## Things we learned (worth keeping)
 
@@ -85,8 +87,11 @@ slots; `addDays`, `weekStart`, `weekDays`, `formatDay` in `features/slots/compon
   `exact: true` for short names.
 - **The mock lives in memory:** in a test or by hand, move between pages with links, not `page.goto`, or a
   reload resets everything you created.
-- **Native time and date inputs follow the system language,** so they may show AM/PM. The app's own times are
-  24-hour.
+- **Native time and date inputs follow the system language,** so they may show AM/PM. From and To are therefore
+  selects of quarter hours (24-hour), and the chosen Day is also written out as "Wed 21 Oct" under the field.
+- **Focus never falls to the page:** when a form, row or button disappears (open/close the service form, cancel a
+  booking, delete a slot, save the profile), focus moves to the form's first field, back to the button that opened
+  it, or to the `role="status"` confirmation (`tabIndex={-1}`).
 - Owner cancel and delete use the same pattern as the client: an AlertDialog, a destructive confirm button with
   an icon and text, and a `role="alert"` message when it fails.
 

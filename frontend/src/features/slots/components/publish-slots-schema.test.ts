@@ -23,6 +23,13 @@ describe('publishSlotsSchema', () => {
     expect(errorFor({ date: '' })).toMatch(/Choose a date/)
   })
 
+  it('needs a real date at most a year ahead', () => {
+    expect(errorFor({ date: '2026-11-31' })).toMatch(/Choose a date/)
+    expect(errorFor({ date: '2026-13-01' })).toMatch(/Choose a date/)
+    expect(errorFor({ date: '2027-10-20' })).toBeUndefined()
+    expect(errorFor({ date: '2027-10-21' })).toMatch(/within a year/)
+  })
+
   it('needs 24-hour times', () => {
     expect(errorFor({ from: '9:00' })).toMatch(/24-hour/)
     expect(errorFor({ to: '24:00' })).toMatch(/24-hour/)

@@ -45,7 +45,7 @@ An appointment a client books at a business (hair salon, gym or service shop) fo
 
 **Relations:** a booking belongs to one client (the user who booked it), one business, one service and one time slot. The copied fields keep the booking readable even if the service changes later.
 
-**Access rules:** a booking needs consecutive free slots covering the service duration (e.g. 120 min = four 30 min slots); creating a booking sets all of those slots to `booked` (the backend does this in `POST /bookings`; the mock does it from the frontend with `useBookRange`); cancelling a booking sets its slots back to `free`; only upcoming bookings (not cancelled, not in the past) can be moved or cancelled; moving a booking frees its old slots and books the new ones (the new time must fit in free slots of the same business, its own old slots count as free; the mock does the swap with `useReleaseRange` and `useBookRange`); a client sees and cancels only their own bookings; a business owner sees the bookings for their business; only a signed-in user can create a booking.
+**Access rules:** a booking needs consecutive free slots covering the service duration (e.g. 120 min = four 30 min slots); creating a booking sets all of those slots to `booked` (the backend does this in `POST /bookings`; the mock does it from the frontend with `useBookRange`); cancelling a booking sets its slots back to `free`; only upcoming bookings (not cancelled, not in the past) can be moved or cancelled; moving a booking frees its old slots and books the new ones (the new time must fit in free slots of the same business, its own old slots count as free; the mock does the swap with `useReleaseRange` and `useBookRange`); a client sees and cancels only their own bookings; a business owner sees the bookings for their business and may only cancel upcoming ones (never move, edit or delete them); only a signed-in user can create a booking.
 
 **API the frontend expects:** `GET /bookings?search=`, `GET /bookings?businessId=` (owner dashboard; display
 filter only, see "Who sees what"), `GET /bookings/:id`, `POST /bookings`, `PATCH /bookings/:id` (cancel = `{ "status": "cancelled" }`, move = `{ "slotId": 10012 }`), `DELETE /bookings/:id`.
@@ -95,7 +95,7 @@ Code: `frontend/src/features/services/` (`types.ts`, `api/services-api.ts`, `api
 Owner page `/owner/services` (`components/manage-services.tsx`, `service-form.tsx`, rules in `service-schema.ts`;
 `useCreateService`, `useUpdateService`, `useDeleteService`): add, edit in place and delete (after a confirm).
 Rules: `name` 2–80 characters, `description` 1–500 (line breaks allowed), both trimmed and without control
-characters; `price` ≥ 0 EUR with at most 2 decimals (a comma works as the decimal mark); `durationMinutes` a whole
+characters; `price` from 0 to 99 999.99 EUR with at most 2 decimals (stored as whole cents) (a comma works as the decimal mark); `durationMinutes` a whole
 number from 5 to 480. Deleting or changing a service does not change bookings already made: they keep copies.
 
 One thing a business offers, e.g. a haircut or an oil change.
@@ -137,7 +137,7 @@ slots can be deleted after a confirm, booked slots say "Booked" and have no dele
 
 **Relations:** a time slot belongs to one business and has at most one active booking.
 
-**Access rules:** everyone can see time slots; only the business owner can create, edit or delete them; a booked slot cannot be deleted.
+**Access rules:** everyone can see time slots; only the business owner can create, edit or delete them; a booked slot cannot be deleted; `status` is never written by a request, only by the booking endpoints (the mock's `useBookRange` / `useReleaseRange` are a stand-in for that).
 
 **API the frontend expects:** `GET /slots?businessId=&date=&status=`, `GET /slots/:id`, `POST /slots`, `PATCH /slots/:id`, `DELETE /slots/:id`.
 
@@ -216,18 +216,33 @@ convenience; anyone can call the API directly, so the server repeats every rule.
   frame-ancestors 'none'; base-uri 'self'; object-src 'none'`. The frontend has no inline scripts (the theme is set
   by `public/theme-init.js`), so `script-src 'self'` needs no hash or nonce; check the built CSS needs no inline styles.
 - **Owner endpoints (from the owner features):** the owner's business always comes from the session; any
-  request for a business, service, slot or booking the caller does not own answers `404`.
+  write for a business, service, slot or booking the caller does not own answers `404`, and so does any owner
+  write from a signed-in user who owns no business. Public reads (`GET /businesses`, `/services`, `/slots`) are
+  unaffected. On `GET /bookings`, `businessId` is ignored unless the caller owns that business.
   - `PATCH /businesses/:id` takes only `{ name, description, city, address, openingHours, imageUrl }` (no
     `category`, `id`, `createdAt` or owner), with the same limits as the form. `imageUrl` is empty or an absolute
-    `https:` URL (reject `http:`, `javascript:`, `data:`); ideally only hosts allowed in the CSP `img-src` or
-    uploaded files, and the server never fetches the URL itself (SSRF).
-  - `POST /services` and `PATCH /services/:id` take only `{ name, description, price, durationMinutes }`; the
-    server sets `businessId` from the session.
-  - `POST /slots` takes only `{ startsAt, durationMinutes }`; `businessId` comes from the session and `status` is
-    always `free`. Reject slots in the past or overlapping an existing slot of that business. A batch endpoint
-    (`POST /slots/batch` with `{ date, from, to, slotMinutes }`) should replace the mock's one request per slot.
-    `DELETE /slots/:id` answers `409` for a booked slot.
-  - Owner cancel uses the same `PATCH /bookings/:id` `{ status: "cancelled" }` and frees the slots on the server;
-    the client should be told (e-mail/SMS, encoded as above).
+    `https:` URL without a `user:password@` part (reject `http:`, `javascript:`, `data:`). Only hosts listed in
+    the CSP `img-src` (or uploaded files) are accepted: any other host would learn the IP of every client who
+    opens the page. The server never fetches the URL itself (SSRF).
+  - `POST /services` and `PATCH /services/:id` take only `{ name, description, price, durationMinutes }`. The
+    mock frontend still sends `businessId` on create: the server ignores it and sets it from the session.
+  - `POST /slots` takes only `{ startsAt, durationMinutes }`; `businessId` comes from the session (a `businessId`
+    in the body is ignored, as above) and `status` is always `free`. `startsAt` must be a real calendar date,
+    not in the past and at most one year ahead. Reject slots overlapping an existing slot of that business, checked
+    in the same transaction as the insert (or with a database exclusion constraint), not by reading first. A batch
+    endpoint (`POST /slots/batch` with `{ date, from, to, slotMinutes }`, at most 96 slots) should replace the
+    mock's one request per slot.
+  - `PATCH /slots/:id` is owner only and takes only `{ startsAt, durationMinutes }` on a free, future slot, with
+    the same overlap check; `status` and `businessId` are rejected. Or drop the endpoint: the frontend does not
+    use it.
+  - `DELETE /slots/:id` is atomic (`DELETE … WHERE id = ? AND business_id = ? AND status = 'free'`) and answers
+    `409` when the slot is booked, so a booking that lands at the same moment is never lost.
+  - Owner cancel uses the same `PATCH /bookings/:id` `{ status: "cancelled" }`, only on upcoming bookings of their
+    business, and frees the slots on the server; the client should be told (e-mail/SMS, encoded as above). The owner
+    may not send `{ slotId }` (moving is the client's choice) or call `DELETE /bookings/:id`; only cancelling leaves
+    a record the client can see.
+  - Rate-limit `POST /slots` (and the batch), `POST`/`PATCH /services` and `PATCH /businesses` per user.
+- **Clear cached data on sign-out:** call `queryClient.clear()` on sign-out and account switch, so the next person
+  on a shared salon tablet does not see the previous owner's client names, phones and notes.
 - **Secrets:** only in environment variables; `.env` files are git-ignored (only `.env.example` is
   committed). `VITE_*` variables are public, because they are bundled into the browser code.

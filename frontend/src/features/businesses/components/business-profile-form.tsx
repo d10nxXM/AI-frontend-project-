@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Save } from 'lucide-react'
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Badge } from '@/components/ui/badge'
@@ -66,6 +66,10 @@ function ProfileFields({ business }: ProfileFieldsProps) {
   const id = useId()
   const updateBusiness = useUpdateBusiness()
   const [saved, setSaved] = useState(false)
+  const savedRef = useRef<HTMLParagraphElement>(null)
+  // The link whose photo failed to load in the preview: a warning, so the owner knows clients
+  // will see the category icon. Not an error, because the host may only be down for a while.
+  const [brokenUrl, setBrokenUrl] = useState('')
   const {
     register,
     handleSubmit,
@@ -83,6 +87,11 @@ function ProfileFields({ business }: ProfileFieldsProps) {
   const imageUrl = watch('imageUrl').trim()
   // Only links the schema accepts are previewed, so no http or javascript: URL is ever loaded.
   const previewUrl = businessProfileSchema.shape.imageUrl.safeParse(imageUrl).success ? imageUrl : ''
+
+  // Saving turns "Save changes" off while it has focus, so focus moves to "Saved".
+  useEffect(() => {
+    if (saved) savedRef.current?.focus()
+  }, [saved])
 
   const save = handleSubmit((values) => {
     setSaved(false)
@@ -171,13 +180,23 @@ function ProfileFields({ business }: ProfileFieldsProps) {
           </Label>
           <Input type="url" inputMode="url" placeholder="https://" maxLength={500} {...field('imageUrl')} />
           {fieldError('imageUrl')}
+          {previewUrl !== '' && brokenUrl === previewUrl && (
+            <p className="text-sm text-muted-foreground">
+              This link does not open a photo, so clients will see the category icon instead.
+            </p>
+          )}
         </div>
       </div>
 
       {/* On phones right under the photo link, before Save; from lg up a sticky side column. */}
       <div className="flex flex-col gap-2 lg:sticky lg:top-8 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
         <span className="text-sm font-medium">Preview</span>
-        <BusinessPhotoPreview key={previewUrl} imageUrl={previewUrl} category={business.category} />
+        <BusinessPhotoPreview
+          key={previewUrl}
+          imageUrl={previewUrl}
+          category={business.category}
+          onError={() => setBrokenUrl(previewUrl)}
+        />
       </div>
 
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center lg:col-start-1">
@@ -186,7 +205,12 @@ function ProfileFields({ business }: ProfileFieldsProps) {
           {updateBusiness.isPending ? 'Saving…' : 'Save changes'}
         </Button>
         {saved && (
-          <p role="status" className="flex items-center gap-2 text-sm font-medium">
+          <p
+            ref={savedRef}
+            tabIndex={-1}
+            role="status"
+            className="flex items-center gap-2 rounded-sm text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring"
+          >
             <Check aria-hidden className="size-4 shrink-0" />
             Saved
           </p>

@@ -1,5 +1,5 @@
 import { Check, Pencil, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -22,6 +22,24 @@ export function ManageServices({ businessId }: ManageServicesProps) {
   const deleteService = useDeleteService()
   const [editing, setEditing] = useState<number | 'new'>()
   const [message, setMessage] = useState('')
+  // Where focus goes once a form closes, so keyboard users keep their place: the service's
+  // Edit button, or "Add service" after adding, cancelling a new one or deleting.
+  const returnFocus = useRef<number | 'new'>(undefined)
+  const addButton = useRef<HTMLButtonElement>(null)
+  const editButtons = useRef(new Map<number, HTMLButtonElement>())
+
+  useEffect(() => {
+    const target = returnFocus.current
+    if (editing !== undefined || target === undefined) return
+    returnFocus.current = undefined
+    const button = target === 'new' ? addButton.current : editButtons.current.get(target)
+    ;(button ?? addButton.current)?.focus()
+  }, [editing, services])
+
+  const close = (target: number | 'new') => {
+    returnFocus.current = target
+    setEditing(undefined)
+  }
 
   const open = (next: number | 'new') => {
     setEditing(next)
@@ -35,7 +53,7 @@ export function ManageServices({ businessId }: ManageServicesProps) {
       { ...values, businessId },
       {
         onSuccess: (service) => {
-          setEditing(undefined)
+          close('new')
           setMessage(`${service.name} added.`)
         },
       },
@@ -46,7 +64,7 @@ export function ManageServices({ businessId }: ManageServicesProps) {
       { id, changes: values },
       {
         onSuccess: (service) => {
-          setEditing(undefined)
+          close(service.id)
           setMessage(`${service.name} saved.`)
         },
       },
@@ -55,7 +73,7 @@ export function ManageServices({ businessId }: ManageServicesProps) {
   const remove = (service: Service) =>
     deleteService.mutate(service.id, {
       onSuccess: () => {
-        if (editing === service.id) setEditing(undefined)
+        close('new')
         setMessage(`${service.name} deleted.`)
       },
     })
@@ -72,10 +90,13 @@ export function ManageServices({ businessId }: ManageServicesProps) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-muted-foreground">What clients can choose when they book.</p>
-        <Button onClick={() => open('new')} disabled={editing === 'new'}>
-          <Plus aria-hidden />
-          Add service
-        </Button>
+        {/* Hidden while the new form is open: its own "Add service" is then the one main action. */}
+        {editing !== 'new' && (
+          <Button ref={addButton} onClick={() => open('new')}>
+            <Plus aria-hidden />
+            Add service
+          </Button>
+        )}
       </div>
 
       {message && (
@@ -93,11 +114,7 @@ export function ManageServices({ businessId }: ManageServicesProps) {
       {editing === 'new' && (
         <section aria-label="New service" className="rounded-lg border">
           <h2 className="px-4 pt-4 text-lg font-semibold">New service</h2>
-          <ServiceForm
-            pending={createService.isPending}
-            onSubmit={create}
-            onCancel={() => setEditing(undefined)}
-          />
+          <ServiceForm pending={createService.isPending} onSubmit={create} onCancel={() => close('new')} />
         </section>
       )}
 
@@ -122,7 +139,7 @@ export function ManageServices({ businessId }: ManageServicesProps) {
                   service={service}
                   pending={updateService.isPending}
                   onSubmit={(values) => update(service.id, values)}
-                  onCancel={() => setEditing(undefined)}
+                  onCancel={() => close(service.id)}
                 />
               </li>
             ) : (
@@ -140,6 +157,10 @@ export function ManageServices({ businessId }: ManageServicesProps) {
                 </div>
                 <div className="flex shrink-0 gap-2">
                   <Button
+                    ref={(button) => {
+                      if (button) editButtons.current.set(service.id, button)
+                      else editButtons.current.delete(service.id)
+                    }}
                     variant="outline"
                     size="sm"
                     onClick={() => open(service.id)}

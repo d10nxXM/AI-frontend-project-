@@ -18,10 +18,12 @@ const line = (label: string, min: number, max: number) =>
     .max(max, `Use at most ${max} characters.`)
     .refine((value) => !hasControl(value), 'Remove special characters such as tabs.')
 
-// Only https photos: no http (mixed content), and no javascript: or data: links.
+// Only https photos: no http (mixed content), no javascript: or data: links, and no
+// user:password@ part, which would put a password in every client's browser.
 const isHttpsUrl = (value: string) => {
   try {
-    return new URL(value).protocol === 'https:'
+    const url = new URL(value)
+    return url.protocol === 'https:' && url.username === '' && url.password === ''
   } catch {
     return false
   }

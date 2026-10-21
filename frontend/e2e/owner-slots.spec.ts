@@ -9,8 +9,8 @@ const row = (page: import('@playwright/test').Page, time: string) =>
 
 async function publish(page: import('@playwright/test').Page, date: string, from: string, to: string) {
   await page.getByLabel('Day', { exact: true }).fill(date)
-  await page.getByLabel('From').fill(from)
-  await page.getByLabel('To', { exact: true }).fill(to)
+  await page.getByLabel('From').selectOption(from)
+  await page.getByLabel('To', { exact: true }).selectOption(to)
   await page.getByRole('button', { name: 'Publish' }).click()
 }
 

@@ -1,10 +1,12 @@
-import { useId } from 'react'
+import { Check } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { localNow } from '@/lib/local-time'
 
 import { useBusinessBookings, useCancelBooking } from '../api/use-bookings'
 import type { Booking } from '../types'
+import { formatStartsAt } from './format-starts-at'
 import { OwnerBookingRow } from './owner-booking-row'
 
 type OwnerBookingsProps = {
@@ -20,6 +22,13 @@ export function OwnerBookings({ businessId, onCancelled }: OwnerBookingsProps) {
   const cancelBooking = useCancelBooking()
   const todayId = useId()
   const upcomingId = useId()
+  const [message, setMessage] = useState('')
+  const messageRef = useRef<HTMLParagraphElement>(null)
+
+  // The cancelled row and its button are gone, so focus moves to the confirmation instead.
+  useEffect(() => {
+    if (message) messageRef.current?.focus()
+  }, [message])
 
   if (isLoading) {
     return (
@@ -42,8 +51,15 @@ export function OwnerBookings({ businessId, onCancelled }: OwnerBookingsProps) {
   const todays = active.filter((b) => b.startsAt.startsWith(today))
   const upcoming = active.filter((b) => !b.startsAt.startsWith(today))
 
-  const cancel = (booking: Booking) =>
-    cancelBooking.mutate(booking.id, { onSuccess: () => onCancelled?.(booking) })
+  const cancel = (booking: Booking) => {
+    setMessage('')
+    cancelBooking.mutate(booking.id, {
+      onSuccess: () => {
+        onCancelled?.(booking)
+        setMessage(`Booking of ${booking.clientName} at ${formatStartsAt(booking.startsAt)} cancelled.`)
+      },
+    })
+  }
 
   const renderList = (list: Booking[], timeOnly: boolean) => (
     <ul className="divide-y rounded-lg border">
@@ -66,6 +82,17 @@ export function OwnerBookings({ businessId, onCancelled }: OwnerBookingsProps) {
         {plural(todays.length, 'booking')} today · {upcoming.length} upcoming
       </p>
 
+      {message && (
+        <p
+          ref={messageRef}
+          tabIndex={-1}
+          role="status"
+          className="flex items-center gap-2 rounded-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring"
+        >
+          <Check aria-hidden className="size-4 shrink-0" />
+          {message}
+        </p>
+      )}
       {cancelBooking.isError && (
         <p role="alert" className="text-destructive">
           The booking could not be cancelled. Please try again.

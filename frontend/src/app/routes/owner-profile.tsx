@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router'
 
 import { BusinessProfileForm } from '@/features/businesses/components/business-profile-form'
@@ -15,7 +15,7 @@ export function OwnerProfile() {
           to={`/businesses/${OWNER_BUSINESS_ID}`}
           className="flex w-fit items-center gap-2 rounded-sm text-sm text-muted-foreground underline-offset-4 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring"
         >
-          <ExternalLink aria-hidden className="size-4" />
+          <ArrowUpRight aria-hidden className="size-4" />
           View public page
         </Link>
       </div>

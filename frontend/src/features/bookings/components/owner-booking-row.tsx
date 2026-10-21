@@ -39,8 +39,11 @@ export function OwnerBookingRow({ booking, timeOnly, onCancel, isCancelling }: O
         </a>
         {booking.note && (
           <p className="flex items-start gap-2 text-sm text-muted-foreground">
-            <MessageSquare aria-label="Note" className="mt-0.5 size-4 shrink-0" />
-            <span className="min-w-0 break-words">{booking.note}</span>
+            <MessageSquare aria-hidden className="mt-0.5 size-4 shrink-0" />
+            <span className="min-w-0 break-words">
+              <span className="sr-only">Note: </span>
+              {booking.note}
+            </span>
           </p>
         )}
       </div>

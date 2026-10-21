@@ -45,5 +45,6 @@ describe('businessProfileSchema', () => {
     expect(fails({ imageUrl: 'javascript:alert(1)' })).toBe(true)
     expect(fails({ imageUrl: 'data:image/png;base64,AAAA' })).toBe(true)
     expect(fails({ imageUrl: 'not a link' })).toBe(true)
+    expect(fails({ imageUrl: 'https://user:pass@example.com/a.jpg' })).toBe(true)
   })
 })

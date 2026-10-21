@@ -5,11 +5,12 @@ import { categoryIcons, type Category } from '@/lib/categories'
 type BusinessPhotoPreviewProps = {
   imageUrl: string
   category: Category
+  onError?: () => void
 }
 
 // The 16:9 cover as clients will see it; the category icon when there is no photo or it fails to load.
 // Key it by the URL, so a new link gets a fresh try.
-export function BusinessPhotoPreview({ imageUrl, category }: BusinessPhotoPreviewProps) {
+export function BusinessPhotoPreview({ imageUrl, category, onError }: BusinessPhotoPreviewProps) {
   const [failed, setFailed] = useState(false)
   const Icon = categoryIcons[category]
 
@@ -26,7 +27,10 @@ export function BusinessPhotoPreview({ imageUrl, category }: BusinessPhotoPrevie
     <img
       src={imageUrl}
       alt="Cover photo preview"
-      onError={() => setFailed(true)}
+      onError={() => {
+        setFailed(true)
+        onError?.()
+      }}
       className="aspect-video w-full rounded-lg bg-muted object-cover"
     />
   )
