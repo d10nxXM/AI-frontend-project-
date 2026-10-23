@@ -30,9 +30,9 @@ export function NextBooking() {
       <h2 className="text-sm font-medium text-muted-foreground">Your next booking</h2>
       <Link
         to={`/bookings/${next.id}`}
-        className="flex items-center gap-4 rounded-lg border p-4 outline-none transition-colors hover:border-foreground/30 focus-visible:ring-3 focus-visible:ring-ring"
+        className="flex items-center gap-4 pressable rounded-2xl bg-card p-4 outline-none focus-visible:ring-3 focus-visible:ring-ring"
       >
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-secondary">
           <Icon aria-hidden className="size-6" />
         </span>
         <span className="flex min-w-0 flex-1 flex-col">

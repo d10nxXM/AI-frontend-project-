@@ -59,7 +59,7 @@ export function ClientDetailsForm({ onChange }: ClientDetailsFormProps) {
     <form
       noValidate
       onSubmit={(e) => e.preventDefault()}
-      className="flex flex-col gap-4 rounded-lg border p-4"
+      className="flex flex-col gap-4 rounded-2xl bg-card p-4"
     >
       {showClear && (
         <p className="text-sm text-muted-foreground">

@@ -33,7 +33,7 @@ export function ReviewForm({ booking }: ReviewFormProps) {
   const review = existing?.[0]
   if (review) {
     return (
-      <section aria-labelledby={`${id}-yours`} className="flex flex-col gap-2 rounded-lg border p-4">
+      <section aria-labelledby={`${id}-yours`} className="flex flex-col gap-2 rounded-2xl bg-card p-4">
         <h2 id={`${id}-yours`} className="font-semibold">
           Your review
         </h2>
@@ -59,7 +59,7 @@ export function ReviewForm({ booking }: ReviewFormProps) {
   }
 
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-4 rounded-lg border p-4">
+    <form noValidate onSubmit={submit} className="flex flex-col gap-4 rounded-2xl bg-card p-4">
       <h2 className="font-semibold">Rate your visit</h2>
 
       <fieldset
@@ -120,8 +120,9 @@ export function ReviewForm({ booking }: ReviewFormProps) {
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Shown publicly as <span className="font-medium text-foreground">“{shortName(booking.clientName)}”</span>, with
-        your rating and comment.
+        Shown publicly as{' '}
+        <span className="font-medium text-foreground">“{shortName(booking.clientName)}”</span>, with your
+        rating and comment.
       </p>
 
       {createReview.isError && (

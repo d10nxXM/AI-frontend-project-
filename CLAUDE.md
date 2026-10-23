@@ -5,11 +5,12 @@ time slot, and lets business owners publish and manage those slots.
 
 ## Theme
 Full design in @frontend/DESIGN.md; tokens in `frontend/src/index.css`.
-- Tone: simple, modern, professional
-- Light mode: white background with crimson red primary; dark mode (`.dark` on `<html>`):
-  near-black background with a lighter red primary. Grays are neutral; red is the only accent.
-- Font: Inter only, `tabular-nums` for times and prices
-- Shape: 8 px radius, thin borders, shadows only on dialogs, dropdowns and popovers
+- Tone: simple, modern, professional, after Apple's HIG and WWDC fluid-motion talks
+- Light mode: grouped gray page (`#F2F2F7`) with white content groups and a red primary
+  (`#D70015`); dark mode (`.dark` on `<html>`): black page, `#1C1C1E` groups. Red is the only accent.
+- Glass (`glass` utility) only on floating chrome: top bar, phone tab bar, sheet, menus, dialogs
+- Font: system font (SF Pro) with Inter as fallback, `tabular-nums` for times and prices
+- Shape: 12 px radius, 20 px content groups, capsule buttons; shadows only on floating layers
 - Users: clients and business owners, 18–45, on every device (check 375 px and 1440 px)
 
 This is a monorepo: one repository for the whole app.

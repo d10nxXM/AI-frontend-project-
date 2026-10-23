@@ -47,15 +47,15 @@ export function BusinessDetail({ id, children, summary }: BusinessDetailProps) {
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
       <title>{`${business.name} · Zakazi.me`}</title>
-      <article className="flex flex-col gap-4 lg:sticky lg:top-8 lg:self-start">
+      <article className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start">
         {business.imageUrl ? (
           <img
             src={business.imageUrl}
             alt={business.name}
-            className="aspect-video w-full rounded-lg bg-muted object-cover"
+            className="aspect-video w-full rounded-2xl bg-muted object-cover"
           />
         ) : (
-          <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-muted text-muted-foreground">
+          <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-muted text-muted-foreground">
             <Icon aria-hidden className="size-12" />
           </div>
         )}
@@ -66,14 +66,14 @@ export function BusinessDetail({ id, children, summary }: BusinessDetailProps) {
             {categoryLabels[business.category]}
           </Badge>
           <div className="flex items-start justify-between gap-4">
-            <h1 className="text-3xl font-bold text-balance">{business.name}</h1>
+            <h1 className="text-3xl leading-tight font-bold text-balance md:text-4xl">{business.name}</h1>
             <FavoriteButton business={business} className="shrink-0" />
           </div>
           {summary?.(business)}
           <p className="text-muted-foreground">{business.description}</p>
         </div>
 
-        <dl className="flex flex-col gap-2 text-sm">
+        <dl className="flex flex-col gap-3 rounded-2xl bg-card p-4 text-sm">
           <div className="flex items-center gap-2">
             <dt>
               <MapPin aria-label="Address" className="size-4 text-muted-foreground" />

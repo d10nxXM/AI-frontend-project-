@@ -12,7 +12,7 @@ const serviceVariants = cva(
   {
     variants: {
       selected: { true: 'bg-muted', false: '' },
-      selectable: { true: 'hover:bg-muted/50', false: '' },
+      selectable: { true: 'hover:bg-muted/50 active:bg-muted', false: '' },
     },
   },
 )
@@ -59,7 +59,7 @@ export function ServicesList({ businessId, selectedId, onSelect, preselectId }: 
   }
 
   return (
-    <ul className="divide-y overflow-hidden rounded-lg border">
+    <ul className="divide-y divide-border/70 overflow-hidden rounded-2xl bg-card">
       {services.map((service) => {
         const selected = service.id === selectedId
         const content = (

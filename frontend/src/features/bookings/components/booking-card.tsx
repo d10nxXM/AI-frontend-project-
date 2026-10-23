@@ -28,12 +28,12 @@ export function BookingCard({ booking, past, onCancel, isCancelling }: BookingCa
   const active = booking.status === 'booked' && !past
 
   return (
-    <Card className="flex h-full flex-row gap-4 overflow-hidden rounded-lg p-4 shadow-none sm:flex-col sm:gap-0 sm:p-0">
+    <Card className="flex h-full flex-row gap-4 overflow-hidden p-4 sm:flex-col sm:gap-0 sm:p-0">
       <img
         src={booking.imageUrl}
         // Decorative: the business name is written right next to it.
         alt=""
-        className="size-16 shrink-0 rounded-md bg-muted object-cover sm:aspect-video sm:size-auto sm:w-full sm:rounded-none"
+        className="size-16 shrink-0 rounded-xl bg-muted object-cover sm:aspect-video sm:size-auto sm:w-full sm:rounded-none"
       />
       <div className="flex min-w-0 flex-1 flex-col gap-2 sm:p-4">
         <div className="flex items-center justify-between gap-2">
@@ -58,7 +58,9 @@ export function BookingCard({ booking, past, onCancel, isCancelling }: BookingCa
             <CalendarClock aria-hidden className="size-4 shrink-0 text-muted-foreground" />
             {formatStartsAt(booking.startsAt)}
           </span>
-          <span className="pl-6 text-sm text-muted-foreground tabular-nums">{booking.durationMinutes} min</span>
+          <span className="pl-6 text-sm text-muted-foreground tabular-nums">
+            {booking.durationMinutes} min
+          </span>
         </span>
         <span className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin aria-hidden className="size-4 shrink-0" />

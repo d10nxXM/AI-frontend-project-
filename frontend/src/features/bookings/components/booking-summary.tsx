@@ -63,7 +63,7 @@ export function BookingSummary({
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border p-4">
+    <div className="flex flex-col gap-4 rounded-2xl bg-card p-4">
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
         <dt className="text-muted-foreground">Service</dt>
         <dd>{service ? service.name : 'Not chosen yet'}</dd>

@@ -2,56 +2,79 @@
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
+/* Translucent surfaces turn solid when the system asks for less transparency. */
+@custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce));
 
 /*
- * Project design tokens. Colors, fonts and radius change ONLY here,
- * in line with DESIGN.md. Components use classes like bg-primary, text-muted-foreground.
+ * Project design tokens. Colors, fonts and radius change ONLY here.
+ * The look follows Apple's interface guidelines: a grouped gray background with white content
+ * groups, system grays, one red accent saved for the main action, glass only on floating chrome.
+ * Contrast figures are WCAG ratios against the surface named in the comment.
  */
 :root {
-  --radius: 0.5rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.18 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0 0);
-  --primary: oklch(0.52 0.2 22);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0 0);
-  --secondary-foreground: oklch(0.22 0 0);
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.48 0 0);
-  --accent: oklch(0.96 0.015 22);
-  --accent-foreground: oklch(0.42 0.17 22);
+  --radius: 0.75rem;
+  /* systemGroupedBackground: content groups (cards) sit on it in white. */
+  --background: #f2f2f7;
+  --foreground: #1d1d1f;
+  --card: #ffffff;
+  --card-foreground: #1d1d1f;
+  --popover: #ffffff;
+  --popover-foreground: #1d1d1f;
+  /* Apple's accessible system red; white text on it is 5.4:1. */
+  --primary: #d70015;
+  --primary-foreground: #ffffff;
+  /* Red as text or an icon (the selected tab): 4.6:1 even on a gray fill. */
+  --tint: #d70015;
+  /* Fills are translucent gray (tertiarySystemFill), so they read on white and on gray alike. */
+  --secondary: rgb(118 118 128 / 0.12);
+  --secondary-foreground: #1d1d1f;
+  --muted: rgb(118 118 128 / 0.12);
+  /* Accessible systemGray: 5.2:1 on white, 4.7:1 on the background. */
+  --muted-foreground: #6c6c70;
+  --accent: rgb(118 118 128 / 0.18);
+  --accent-foreground: #1d1d1f;
+  /* A more orange red, so errors and deletions are not confused with the main action. */
   --destructive: oklch(0.5 0.19 38);
-  --border: oklch(0.91 0 0);
-  --input: oklch(0.91 0 0);
-  --ring: oklch(0.52 0.2 22);
-  --font-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --border: #d1d1d6;
+  --input: #d1d1d6;
+  --ring: #d70015;
+  /* The bright top edge of glass, light catching the material. */
+  --glass-edge: rgb(255 255 255 / 0.7);
+  --font-heading: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
 }
 
 .dark {
   /* Native scrollbars and form controls follow the dark theme. */
   color-scheme: dark;
-  --background: oklch(0.14 0 0);
-  --foreground: oklch(0.96 0 0);
-  --card: oklch(0.18 0 0);
-  --card-foreground: oklch(0.96 0 0);
-  --popover: oklch(0.18 0 0);
-  --popover-foreground: oklch(0.96 0 0);
-  --primary: oklch(0.56 0.2 22);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.24 0 0);
-  --secondary-foreground: oklch(0.96 0 0);
-  --muted: oklch(0.22 0 0);
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: oklch(0.26 0.05 22);
-  --accent-foreground: oklch(0.85 0.08 22);
+  --background: #000000;
+  --foreground: #f5f5f7;
+  --card: #1c1c1e;
+  --card-foreground: #f5f5f7;
+  --popover: #2c2c2e;
+  --popover-foreground: #f5f5f7;
+  /* Brighter than in light mode so it stands out on black; white text on it is 4.7:1. */
+  --primary: #e0262f;
+  --primary-foreground: #ffffff;
+  /* Apple's accessible dark red: 4.8:1 on a gray fill over glass, where #e0262f is only 2.9:1. */
+  --tint: #ff6961;
+  --secondary: rgb(118 118 128 / 0.24);
+  --secondary-foreground: #f5f5f7;
+  --muted: rgb(118 118 128 / 0.24);
+  /* 5.9:1 on cards, 7.3:1 on the background. */
+  --muted-foreground: #98989f;
+  --accent: rgb(118 118 128 / 0.32);
+  --accent-foreground: #f5f5f7;
   --destructive: oklch(0.65 0.18 38);
-  --border: oklch(0.28 0 0);
-  --input: oklch(0.3 0 0);
-  --ring: oklch(0.56 0.2 22);
+  --border: #38383a;
+  --input: #38383a;
+  --ring: #e0262f;
+  --glass-edge: rgb(255 255 255 / 0.08);
+}
+
+/* Static theme values: the upward shadow of a sheet that rises from the bottom edge. */
+@theme {
+  --shadow-sheet: 0 -8px 32px rgb(0 0 0 / 0.08);
 }
 
 @theme inline {
@@ -63,6 +86,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-tint: var(--tint);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -73,24 +97,101 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
   --font-heading: var(--font-heading);
   --font-sans: var(--font-body);
+}
+
+/*
+ * Glass for the floating functional layer only (bars, the sheet, menus, dialogs), never for
+ * content. Solid when the system asks for less transparency or more contrast.
+ */
+@utility glass {
+  background-color: color-mix(in oklab, var(--card) 72%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(24px) saturate(1.6);
+  /* The edge goes through Tailwind's shadow variables, so shadow-* and ring-* still combine. */
+  --tw-inset-shadow: inset 0 1px 0 0 var(--glass-edge);
+  box-shadow:
+    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000), var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow, 0 0 #0000);
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  @media (prefers-contrast: more) {
+    background-color: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    outline: 1px solid var(--foreground);
+  }
+}
+
+/* Feedback on press, not on release; reduced motion keeps the color change but drops the scale. */
+@utility pressable {
+  transition-property: transform, background-color, border-color, color, opacity;
+  transition-duration: 120ms;
+  transition-timing-function: ease-out;
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+/*
+ * Scroll edge effect: the hairline under the top bar appears only once content scrolls beneath
+ * it. Browsers without scroll-driven animations simply show no hairline.
+ */
+@keyframes scroll-edge {
+  to {
+    border-bottom-color: color-mix(in oklab, var(--border) 70%, transparent);
+  }
+}
+
+@utility scroll-edge {
+  border-bottom: 1px solid transparent;
+  animation: scroll-edge linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 32px;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    /* Room above the floating tab bar on phones, nothing on wider screens. */
+    --tab-bar-space: calc(4.75rem + env(safe-area-inset-bottom));
+    /* Focus and scroll-into-view stop clear of the glass bars instead of hiding under them. */
+    scroll-padding-top: 4.5rem;
+    scroll-padding-bottom: calc(var(--tab-bar-space) + 1rem);
+  }
+  @media (width >= 48rem) {
+    html {
+      --tab-bar-space: 0px;
+    }
+  }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    font-optical-sizing: auto;
   }
-  h1,
+  /* Tracking tightens as type grows; body text stays at 0. */
+  h1 {
+    @apply font-heading tracking-[-0.025em];
+  }
   h2,
   h3 {
-    @apply font-heading;
+    @apply font-heading tracking-[-0.015em];
   }
 }

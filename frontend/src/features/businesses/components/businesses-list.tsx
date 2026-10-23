@@ -38,7 +38,7 @@ export function BusinessesList({
     return (
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton key={i} className="h-24 sm:h-80" />
+          <Skeleton key={i} className="h-24 rounded-2xl sm:h-80" />
         ))}
       </div>
     )
