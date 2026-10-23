@@ -13,16 +13,16 @@ type SlotState = 'free' | 'tooShort' | 'booked' | 'selected' | 'current'
 
 // Every state differs by text and style, not by color alone (DESIGN.md).
 const slotVariants = cva(
-  'flex w-full flex-col items-center rounded-lg border p-2 text-sm tabular-nums outline-none focus-visible:ring-3 focus-visible:ring-ring disabled:cursor-not-allowed',
+  'pressable flex w-full flex-col items-center rounded-xl border p-2 text-sm tabular-nums outline-none focus-visible:ring-3 focus-visible:ring-ring disabled:cursor-not-allowed',
   {
     variants: {
       state: {
         // Before a service is chosen: visibly inactive, but still readable (no opacity).
-        free: 'enabled:hover:bg-muted/50 disabled:border-dashed disabled:bg-muted/40 disabled:text-muted-foreground',
-        tooShort: 'border-dashed text-muted-foreground',
-        booked: 'bg-muted text-muted-foreground',
-        selected: 'border-primary bg-primary text-primary-foreground',
-        current: 'border-foreground font-semibold',
+        free: 'border-transparent bg-card enabled:hover:bg-muted/50 disabled:border-dashed disabled:border-muted-foreground/50 disabled:bg-transparent disabled:text-muted-foreground',
+        tooShort: 'border-dashed border-muted-foreground/50 text-muted-foreground',
+        booked: 'border-transparent bg-muted text-muted-foreground',
+        selected: 'border-transparent bg-primary text-primary-foreground',
+        current: 'border-foreground bg-card font-semibold',
       },
     },
   },
@@ -56,6 +56,30 @@ const dayFormat = new Intl.DateTimeFormat('en-GB', {
 })
 
 const formatDay = (date: string) => dayFormat.format(new Date(`${date}T00:00Z`))
+
+// The parts of a day chip, styled like the week strip in Apple's Calendar.
+const dayParts = (date: string) => {
+  const parts = dayFormat.formatToParts(new Date(`${date}T00:00Z`))
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? ''
+  return { weekday: part('weekday'), day: part('day'), month: part('month') }
+}
+
+// The selected day is filled dark; the label is the same either way, aria-pressed says which.
+const dayChipVariants = cva(
+  'h-auto w-18 shrink-0 snap-start flex-col gap-0 rounded-2xl px-0 py-2 tabular-nums md:w-auto',
+  {
+    variants: {
+      selected: {
+        true: 'bg-foreground text-background hover:bg-foreground/90',
+        false: 'bg-card text-foreground hover:bg-muted/50',
+      },
+    },
+  },
+)
+
+const dayNoteVariants = cva('text-[0.6875rem] font-medium', {
+  variants: { selected: { true: 'text-background/80', false: 'text-muted-foreground' } },
+})
 
 // Future slots grouped by day; days with nothing left today are dropped.
 function groupByDay(slots: TimeSlot[]) {
@@ -152,21 +176,31 @@ export function SlotsByDay({
       <div
         role="group"
         aria-label="Day"
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-6 md:px-0"
+        className="-mx-4 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-7 md:px-0"
       >
-        {days.map((d) => (
-          <Button
-            key={d.date}
-            size="sm"
-            variant="outline"
-            aria-pressed={d.date === day.date}
-            onClick={() => setSelectedDate(d.date)}
-            className="w-28 shrink-0 flex-col gap-0 py-6 tabular-nums aria-pressed:border-foreground aria-pressed:bg-muted md:w-auto"
-          >
-            <span>{formatDay(d.date)}</span>
-            <span className="text-xs font-normal text-muted-foreground">{d.freeCount} free</span>
-          </Button>
-        ))}
+        {days.map((d, index) => {
+          const selected = d.date === day.date
+          const { weekday, day: dayNumber, month } = dayParts(d.date)
+          // The month only where the strip starts or the month changes, like a calendar.
+          const showMonth = index === 0 || month !== dayParts(days[index - 1].date).month
+          return (
+            <Button
+              key={d.date}
+              variant="outline"
+              aria-pressed={selected}
+              aria-label={`${formatDay(d.date)}, ${d.freeCount} free`}
+              onClick={() => setSelectedDate(d.date)}
+              className={dayChipVariants({ selected })}
+            >
+              <span className={dayNoteVariants({ selected })}>
+                {weekday}
+                {showMonth && ` ${month}`}
+              </span>
+              <span className="text-xl leading-tight font-semibold">{dayNumber}</span>
+              <span className={dayNoteVariants({ selected })}>{d.freeCount} free</span>
+            </Button>
+          )
+        })}
       </div>
 
       {day.freeCount === 0 ? (

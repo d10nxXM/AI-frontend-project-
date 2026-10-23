@@ -21,7 +21,7 @@ export function ThemeToggle() {
       aria-label="Dark mode"
       title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
       onClick={toggle}
-      className="flex size-9 items-center justify-center rounded-md border text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring"
+      className="pressable flex size-10 items-center justify-center rounded-full bg-secondary text-foreground outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring"
     >
       {dark ? <Sun aria-hidden className="size-4" /> : <Moon aria-hidden className="size-4" />}
     </button>

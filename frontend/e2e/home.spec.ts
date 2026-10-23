@@ -35,7 +35,11 @@ test('the next booking links to that booking', async ({ page }) => {
   await page.goto('/')
   const next = page.getByRole('region', { name: 'Your next booking' })
   await expect(next).toContainText("Women's haircut and blow-dry")
-  await next.getByRole('link').click()
+  // The sheet peeks collapsed; open it like a user would, then follow the link to the booking
+  // itself (the sheet also links to directions).
+  await next.getByRole('button', { expanded: false }).click()
+  await expect(next.getByRole('button', { expanded: true })).toBeVisible()
+  await next.getByRole('link', { name: 'View booking' }).click()
   await expect(page).toHaveURL(/\/bookings\/1$/)
 })
 

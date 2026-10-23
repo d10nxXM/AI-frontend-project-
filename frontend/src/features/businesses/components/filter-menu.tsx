@@ -10,8 +10,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-// An active filter gets a dark border and fill, not only a lighter gray.
-export const activeFilter = 'aria-pressed:border-foreground aria-pressed:bg-muted'
+// An active filter turns dark-filled like an iOS chip, not only a slightly different gray.
+export const activeFilter =
+  'aria-pressed:bg-foreground aria-pressed:text-background aria-pressed:hover:bg-foreground/90 aria-pressed:[&_svg]:text-background'
 
 // Radix radio items need a string value; "All" uses one no option can have.
 const ALL = '\u0000all'

@@ -26,7 +26,7 @@ export function BookingsList({ search, onCancelled, onClearSearch }: BookingsLis
     return (
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton key={i} className="h-36 sm:h-96" />
+          <Skeleton key={i} className="h-36 rounded-2xl sm:h-96" />
         ))}
       </div>
     )

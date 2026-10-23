@@ -23,17 +23,17 @@ export function BusinessCard({ business, extra }: BusinessCardProps) {
   const Icon = categoryIcons[business.category]
 
   return (
-    <div className="group relative h-full rounded-lg has-[a:focus-visible]:ring-3 has-[a:focus-visible]:ring-ring">
-      <Card className="flex h-full flex-row gap-4 overflow-hidden rounded-lg p-4 shadow-none transition-colors group-hover:border-foreground/30 sm:flex-col sm:gap-0 sm:p-0">
+    <div className="pressable group relative h-full rounded-2xl has-[a:focus-visible]:ring-3 has-[a:focus-visible]:ring-ring">
+      <Card className="flex h-full flex-row gap-4 overflow-hidden p-4 transition-shadow sm:group-hover:shadow-lg sm:flex-col sm:gap-0 sm:p-0">
         {business.imageUrl ? (
           <img
             src={business.imageUrl}
             // Decorative: the name next to it is the link, so screen readers do not hear it twice.
             alt=""
-            className="size-16 shrink-0 rounded-md bg-muted object-cover sm:aspect-video sm:size-auto sm:w-full sm:rounded-none"
+            className="size-16 shrink-0 rounded-xl bg-muted object-cover sm:aspect-video sm:size-auto sm:w-full sm:rounded-none"
           />
         ) : (
-          <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground sm:aspect-video sm:size-auto sm:w-full sm:rounded-none">
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground sm:aspect-video sm:size-auto sm:w-full sm:rounded-none">
             <Icon aria-hidden className="size-6 sm:size-10" />
           </div>
         )}

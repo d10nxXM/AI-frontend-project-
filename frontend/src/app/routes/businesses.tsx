@@ -57,7 +57,7 @@ export function Businesses() {
     <section>
       <title>Businesses · Zakazi.me</title>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <h1 className="text-3xl font-bold">Businesses</h1>
+        <h1 className="text-3xl leading-tight font-bold md:text-4xl">Businesses</h1>
         <Input
           aria-label="Search businesses"
           placeholder="Search by name"

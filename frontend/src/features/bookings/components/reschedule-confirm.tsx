@@ -27,14 +27,11 @@ export function RescheduleConfirm({
 
   function confirm() {
     if (!slot) return
-    reschedule.mutate(
-      { id: booking.id, slot },
-      { onSuccess: (updated) => onRescheduled(updated, booking) },
-    )
+    reschedule.mutate({ id: booking.id, slot }, { onSuccess: (updated) => onRescheduled(updated, booking) })
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border p-4">
+    <div className="flex flex-col gap-4 rounded-2xl bg-card p-4">
       <p className="flex flex-wrap items-center gap-2 text-sm tabular-nums">
         <span className="text-muted-foreground">{formatStartsAt(booking.startsAt)}</span>
         <ArrowRight aria-label="to" className="size-4 text-muted-foreground" />

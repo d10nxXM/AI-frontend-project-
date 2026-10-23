@@ -29,7 +29,8 @@ export function FavoriteButton({ business, className }: FavoriteButtonProps) {
       title={saved ? 'Remove from favorites' : 'Save to favorites'}
       onClick={() => toggle(business.id)}
       className={cn(
-        'flex size-10 items-center justify-center rounded-full border bg-background outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring',
+        // Glass, because on wider screens it floats over the cover photo.
+        'glass pressable flex size-10 items-center justify-center rounded-full outline-none hover:bg-card focus-visible:ring-3 focus-visible:ring-ring',
         className,
       )}
     >

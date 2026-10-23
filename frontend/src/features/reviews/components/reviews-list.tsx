@@ -35,7 +35,7 @@ export function ReviewsList({ businessId }: ReviewsListProps) {
   }
 
   return (
-    <ul className="divide-y rounded-lg border">
+    <ul className="divide-y divide-border/70 overflow-hidden rounded-2xl bg-card">
       {reviews.map((review) => (
         <li key={review.id} className="flex flex-col gap-1 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">

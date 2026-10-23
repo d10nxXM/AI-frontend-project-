@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
 
-import { NextBooking } from '@/features/bookings/components/next-booking'
+import { NextBookingSheet } from '@/features/bookings/components/next-booking-sheet'
 import { BusinessSearchForm } from '@/features/businesses/components/business-search-form'
 import { BusinessesList } from '@/features/businesses/components/businesses-list'
 import { CategoryLinks } from '@/features/businesses/components/category-links'
@@ -20,13 +20,11 @@ export function Home() {
       <title>Zakazi.me</title>
 
       <section className="flex flex-col gap-4 pt-4 md:pt-8">
-        <h1 className="text-3xl font-bold text-balance md:text-4xl">
+        <h1 className="text-3xl leading-tight font-bold text-balance md:text-5xl">
           Book a free time at a salon, gym or service shop
         </h1>
         <BusinessSearchForm onSearch={search} />
       </section>
-
-      <NextBooking />
 
       <section aria-labelledby="home-categories" className="flex flex-col gap-4">
         <h2 id="home-categories" className="text-xl font-semibold">
@@ -59,6 +57,8 @@ export function Home() {
           )}
         />
       </section>
+
+      <NextBookingSheet />
     </div>
   )
 }

@@ -25,7 +25,7 @@ const layoutVariants = cva('grid grid-cols-1 gap-8', {
 })
 
 const articleVariants = cva('flex flex-col gap-4', {
-  variants: { columns: { one: '', two: 'lg:sticky lg:top-8 lg:self-start' } },
+  variants: { columns: { one: '', two: 'lg:sticky lg:top-20 lg:self-start' } },
 })
 
 type BookingDetailProps = {
@@ -72,7 +72,7 @@ export function BookingDetail({ id, onCancelled, children, pastActions }: Bookin
         <img
           src={booking.imageUrl}
           alt={booking.businessName}
-          className="aspect-video w-full rounded-lg bg-muted object-cover"
+          className="aspect-video w-full rounded-2xl bg-muted object-cover"
         />
         <div className="flex items-center justify-between gap-2">
           <Link
@@ -86,7 +86,7 @@ export function BookingDetail({ id, onCancelled, children, pastActions }: Bookin
             {cancelled ? 'Cancelled' : upcoming ? 'Booked' : 'Past'}
           </Badge>
         </div>
-        <h1 className="text-3xl font-bold text-balance">{booking.serviceName}</h1>
+        <h1 className="text-3xl leading-tight font-bold text-balance md:text-4xl">{booking.serviceName}</h1>
         <p className="text-muted-foreground">{booking.serviceDescription}</p>
 
         <dl className="flex flex-col gap-2 text-sm">
