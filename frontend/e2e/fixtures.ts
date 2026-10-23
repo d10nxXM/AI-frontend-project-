@@ -39,6 +39,18 @@ export const horizontalOverflow = (page: Page) =>
 export const dayChip = (page: Page, day: string) =>
   page.getByRole('group', { name: 'Day' }).getByRole('button', { name: new RegExp(`^${day}`) })
 
+// Business list filters live in the "Filters" group. Dropdown buttons are named "<label>: <choice>",
+// e.g. "Category: All"; toggles keep their own name ("Free today").
+export const filters = (page: Page) => page.getByRole('group', { name: 'Filters' })
+export const filterMenu = (page: Page, label: string) =>
+  filters(page).getByRole('button', { name: new RegExp(`^${label}: `) })
+
+// Opens a filter dropdown and picks one option, e.g. pickFilter(page, 'Category', 'Gym').
+export async function pickFilter(page: Page, label: string, option: string) {
+  await filterMenu(page, label).click()
+  await page.getByRole('menuitemradio', { name: option, exact: true }).click()
+}
+
 // Slot buttons are named "<day>, <time>, <note>", e.g. "Wed 21 Oct, 10:00, Too short".
 export const slot = (page: Page, name: string) => page.getByRole('button', { name, exact: true })
 

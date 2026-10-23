@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures.ts'
+import { expect, filters, pickFilter, test } from './fixtures.ts'
 
 // Times follow the mock slots of Tue 20 Oct 2026: Studio Lana has 09:00-10:00 taken, the car
 // service (AutoServis Delta) closes at 16:00 and iFix Niksic has its last slot at 17:00.
@@ -32,14 +32,14 @@ test('"Free today" hides businesses with no free time left today, and is kept in
   const cards = page.getByRole('main').getByRole('listitem')
   await expect(cards).toHaveCount(6)
 
-  await page.getByRole('group', { name: 'When' }).getByRole('button', { name: 'Free today' }).click()
+  await filters(page).getByRole('button', { name: 'Free today' }).click()
   await expect(page).toHaveURL(/available=today/)
   await expect(cards).toHaveCount(4)
   await expect(card(page, 'AutoServis Delta')).toHaveCount(0)
   await expect(card(page, 'iFix Niksic')).toHaveCount(0)
 
   // Combines with the other filters, and both stay in the URL.
-  await page.getByRole('group', { name: 'Category' }).getByRole('button', { name: 'Gym' }).click()
+  await pickFilter(page, 'Category', 'Gym')
   await expect(page).toHaveURL(/category=gym/)
   await expect(page).toHaveURL(/available=today/)
   await expect(cards).toHaveCount(2)
