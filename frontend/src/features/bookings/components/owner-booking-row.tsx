@@ -21,14 +21,14 @@ export function OwnerBookingRow({ booking, timeOnly, onCancel, isCancelling }: O
   return (
     <article className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:gap-6">
       <div className="flex items-baseline gap-2 sm:w-40 sm:shrink-0 sm:flex-col sm:gap-0">
-        <span className="text-base font-semibold whitespace-nowrap tabular-nums">
+        <span className="text-lg font-semibold tracking-[-0.01em] whitespace-nowrap tabular-nums">
           {timeOnly ? booking.startsAt.slice(11, 16) : formatStartsAt(booking.startsAt)}
         </span>
         <span className="text-sm text-muted-foreground tabular-nums">{booking.durationMinutes} min</span>
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h3 className="font-medium">{booking.serviceName}</h3>
+        <h3 className="font-semibold">{booking.serviceName}</h3>
         <p className="text-sm">{booking.clientName}</p>
         <a
           href={phoneHref}

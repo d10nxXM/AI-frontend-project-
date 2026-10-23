@@ -14,7 +14,7 @@ import { formatDay } from './schedule-dates'
 
 // Looks like the Input component, for the native select.
 const selectClassName =
-  'h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base tabular-nums shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm dark:bg-background'
+  'h-11 w-full min-w-0 rounded-lg border border-transparent bg-secondary px-3 py-1 text-base tabular-nums outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive contrast-more:border-foreground md:text-sm'
 
 // Every quarter hour as HH:mm. Native time inputs follow the browser's language and may show
 // AM/PM; a select keeps the app's 24-hour clock everywhere.
@@ -88,7 +88,7 @@ export function PublishSlotsForm({ businessId, onPublished }: PublishSlotsFormPr
     )
 
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-4 rounded-lg border p-4">
+    <form noValidate onSubmit={submit} className="flex flex-col gap-4 rounded-2xl bg-card p-4 md:p-6">
       <h2 className="text-xl font-semibold">Publish free times</h2>
       <div className="grid grid-cols-2 items-start gap-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
         <div className="col-span-2 flex flex-col gap-2 lg:col-span-1">
@@ -125,7 +125,11 @@ export function PublishSlotsForm({ businessId, onPublished }: PublishSlotsFormPr
           {error('slotMinutes')}
         </div>
         {/* Lines up with the inputs on desktop, under the labels' height. */}
-        <Button type="submit" disabled={publish.isPending} className="col-span-2 lg:col-span-1 lg:mt-6">
+        <Button
+          type="submit"
+          disabled={publish.isPending}
+          className="col-span-2 lg:col-span-1 lg:mt-6 lg:h-11"
+        >
           <CalendarPlus aria-hidden />
           {publish.isPending ? 'Publishing…' : 'Publish'}
         </Button>
