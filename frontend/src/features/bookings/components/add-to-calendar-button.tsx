@@ -17,7 +17,9 @@ export function AddToCalendarButton({ booking }: AddToCalendarButtonProps) {
   function download() {
     let content: string
     try {
-      content = bookingCalendarFile(booking, `${window.location.origin}/bookings/${booking.id}`)
+      // BASE_URL ends with '/': it is '/' locally and '/<repo>/' on GitHub Pages.
+      const bookingUrl = `${window.location.origin}${import.meta.env.BASE_URL}bookings/${booking.id}`
+      content = bookingCalendarFile(booking, bookingUrl)
     } catch {
       setFailed(true)
       return
