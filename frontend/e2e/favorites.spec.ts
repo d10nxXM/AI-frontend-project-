@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures.ts'
+import { expect, filters, pickFilter, test } from './fixtures.ts'
 
 const heart = (page: import('@playwright/test').Page, name: string) =>
   page.getByRole('main').getByRole('button', { name: `Favorite ${name}`, exact: true })
@@ -53,11 +53,11 @@ test('"Favorites" shows only saved businesses, combines with other filters and s
   await heart(page, 'Studio Lana').click()
   await heart(page, 'Iron Gym').click()
 
-  await page.getByRole('group', { name: 'Show' }).getByRole('button', { name: 'Favorites' }).click()
+  await filters(page).getByRole('button', { name: 'Favorites' }).click()
   await expect(page).toHaveURL(/favorites=1/)
   await expect(cards(page)).toHaveCount(2)
 
-  await page.getByRole('group', { name: 'Category' }).getByRole('button', { name: 'Gym' }).click()
+  await pickFilter(page, 'Category', 'Gym')
   await expect(cards(page)).toHaveCount(1)
   await expect(cards(page)).toContainText('Iron Gym')
 

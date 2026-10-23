@@ -1,4 +1,4 @@
-import { expect, horizontalOverflow, test } from './fixtures.ts'
+import { expect, horizontalOverflow, pickFilter, test } from './fixtures.ts'
 
 // Each page with a text that only shows once its data has loaded.
 const pages = [
@@ -32,8 +32,8 @@ test('category and city filters combine, and an empty result can be cleared', as
   const cards = page.getByRole('main').getByRole('listitem')
   await expect(cards).toHaveCount(6)
 
-  await page.getByRole('group', { name: 'Category' }).getByRole('button', { name: 'Gym' }).click()
-  await page.getByRole('group', { name: 'City' }).getByRole('button', { name: 'Niksic' }).click()
+  await pickFilter(page, 'Category', 'Gym')
+  await pickFilter(page, 'City', 'Niksic')
   await expect(cards).toHaveCount(1)
   await expect(cards).toContainText('Iron Gym')
 

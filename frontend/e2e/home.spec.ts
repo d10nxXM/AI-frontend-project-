@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures.ts'
+import { expect, filterMenu, pickFilter, test } from './fixtures.ts'
 
 test('search on the home page opens the filtered business list', async ({ page }) => {
   await page.goto('/')
@@ -25,8 +25,8 @@ test('a category tile opens the list with that category selected', async ({ page
   await page.getByRole('link', { name: 'Gyms, 2 places' }).click()
 
   await expect(page).toHaveURL(/\/businesses\?category=gym$/)
-  const category = page.getByRole('group', { name: 'Category' })
-  await expect(category.getByRole('button', { name: 'Gym' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(filterMenu(page, 'Category')).toHaveAccessibleName('Category: Gym')
+  await expect(filterMenu(page, 'Category')).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('main').getByRole('listitem')).toHaveCount(2)
 })
 
@@ -49,7 +49,7 @@ test('the home page shows three businesses and a link to all of them', async ({ 
 
 test('filters are kept in the URL and restored by the back button', async ({ page }) => {
   await page.goto('/businesses')
-  await page.getByRole('group', { name: 'City' }).getByRole('button', { name: 'Budva' }).click()
+  await pickFilter(page, 'City', 'Budva')
   await expect(page).toHaveURL(/city=Budva/)
   await page
     .getByRole('main')
@@ -59,9 +59,8 @@ test('filters are kept in the URL and restored by the back button', async ({ pag
 
   await page.goBack()
   await expect(page).toHaveURL(/city=Budva/)
-  await expect(
-    page.getByRole('group', { name: 'City' }).getByRole('button', { name: 'Budva' }),
-  ).toHaveAttribute('aria-pressed', 'true')
+  await expect(filterMenu(page, 'City')).toHaveAccessibleName('City: Budva')
+  await expect(filterMenu(page, 'City')).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('main').getByRole('listitem')).toHaveCount(2)
 })
 

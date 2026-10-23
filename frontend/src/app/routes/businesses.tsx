@@ -74,6 +74,7 @@ export function Businesses() {
         onFreeTodayChange={(freeToday) => setUrl(filter, { ...toggles, freeToday })}
         favoritesOnly={toggles.favoritesOnly}
         onFavoritesOnlyChange={(favoritesOnly) => setUrl(filter, { ...toggles, favoritesOnly })}
+        onReset={() => setUrl({ search: filter.search }, { freeToday: false, favoritesOnly: false })}
       />
       <BusinessesList
         filter={debouncedFilter}
