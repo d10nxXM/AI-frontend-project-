@@ -112,7 +112,7 @@ export function ManageServices({ businessId }: ManageServicesProps) {
       )}
 
       {editing === 'new' && (
-        <section aria-label="New service" className="rounded-lg border">
+        <section aria-label="New service" className="rounded-2xl bg-card">
           <h2 className="px-4 pt-4 text-lg font-semibold">New service</h2>
           <ServiceForm pending={createService.isPending} onSubmit={create} onCancel={() => close('new')} />
         </section>
@@ -121,17 +121,19 @@ export function ManageServices({ businessId }: ManageServicesProps) {
       {isLoading ? (
         <div className="flex flex-col gap-2">
           {Array.from({ length: 3 }, (_, i) => (
-            <Skeleton key={i} className="h-24" />
+            <Skeleton key={i} className="h-24 rounded-2xl" />
           ))}
         </div>
       ) : error ? (
         <p className="text-destructive">Services failed to load. Please try again.</p>
       ) : !services || services.length === 0 ? (
         editing !== 'new' && (
-          <p className="text-muted-foreground">No services yet. Add the first one so clients can book.</p>
+          <p className="rounded-2xl bg-card p-4 text-muted-foreground">
+            No services yet. Add the first one so clients can book.
+          </p>
         )
       ) : (
-        <ul className="divide-y overflow-hidden rounded-lg border">
+        <ul className="divide-y divide-border/70 overflow-hidden rounded-2xl bg-card">
           {services.map((service) =>
             editing === service.id ? (
               <li key={service.id}>
@@ -148,7 +150,7 @@ export function ManageServices({ businessId }: ManageServicesProps) {
                 className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between"
               >
                 <div className="flex min-w-0 flex-col gap-1">
-                  <h3 className="font-medium">{service.name}</h3>
+                  <h3 className="font-semibold">{service.name}</h3>
                   <p className="text-sm text-muted-foreground">{service.description}</p>
                   <p className="text-sm tabular-nums">
                     <span className="font-semibold">€{service.price}</span>

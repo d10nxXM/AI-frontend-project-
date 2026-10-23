@@ -35,7 +35,7 @@ export function OwnerBookings({ businessId, onCancelled }: OwnerBookingsProps) {
       <div className="flex flex-col gap-4">
         <Skeleton className="h-5 w-48" />
         {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton key={i} className="h-28" />
+          <Skeleton key={i} className="h-28 rounded-2xl" />
         ))}
       </div>
     )
@@ -62,7 +62,7 @@ export function OwnerBookings({ businessId, onCancelled }: OwnerBookingsProps) {
   }
 
   const renderList = (list: Booking[], timeOnly: boolean) => (
-    <ul className="divide-y rounded-lg border">
+    <ul className="divide-y divide-border/70 overflow-hidden rounded-2xl bg-card">
       {list.map((booking) => (
         <li key={booking.id}>
           <OwnerBookingRow
@@ -78,7 +78,7 @@ export function OwnerBookings({ businessId, onCancelled }: OwnerBookingsProps) {
 
   return (
     <div className="flex flex-col gap-8">
-      <p className="text-muted-foreground tabular-nums">
+      <p className="-mt-2 text-lg text-muted-foreground tabular-nums">
         {plural(todays.length, 'booking')} today · {upcoming.length} upcoming
       </p>
 
@@ -99,25 +99,25 @@ export function OwnerBookings({ businessId, onCancelled }: OwnerBookingsProps) {
         </p>
       )}
 
-      <section aria-labelledby={todayId} className="flex flex-col gap-4">
+      <section aria-labelledby={todayId} className="flex flex-col gap-3">
         <h2 id={todayId} className="text-xl font-semibold">
           Today
         </h2>
         {todays.length > 0 ? (
           renderList(todays, true)
         ) : (
-          <p className="text-muted-foreground">No bookings today.</p>
+          <p className="rounded-2xl bg-card p-4 text-muted-foreground">No bookings today.</p>
         )}
       </section>
 
-      <section aria-labelledby={upcomingId} className="flex flex-col gap-4">
+      <section aria-labelledby={upcomingId} className="flex flex-col gap-3">
         <h2 id={upcomingId} className="text-xl font-semibold">
           Upcoming
         </h2>
         {upcoming.length > 0 ? (
           renderList(upcoming, false)
         ) : (
-          <p className="text-muted-foreground">No upcoming bookings.</p>
+          <p className="rounded-2xl bg-card p-4 text-muted-foreground">No upcoming bookings.</p>
         )}
       </section>
     </div>

@@ -13,7 +13,7 @@ export function OwnerSlots() {
   return (
     <section className="flex flex-col gap-8">
       <title>Time slots · Zakazi.me</title>
-      <h1 className="text-3xl font-bold">Time slots</h1>
+      <h1 className="text-3xl leading-tight font-bold md:text-4xl">Time slots</h1>
       <PublishSlotsForm businessId={OWNER_BUSINESS_ID} onPublished={setDate} />
       <OwnerSchedule businessId={OWNER_BUSINESS_ID} date={date} onDateChange={setDate} />
     </section>

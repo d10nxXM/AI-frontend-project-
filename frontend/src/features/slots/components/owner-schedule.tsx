@@ -19,19 +19,21 @@ type OwnerSlotState = 'free' | 'booked' | 'past'
 const stateLabels: Record<OwnerSlotState, string> = { free: 'Free', booked: 'Booked', past: 'Past' }
 
 const chipVariants = cva(
-  'flex items-center justify-between gap-2 rounded-md border px-2 py-1 text-sm tabular-nums',
+  'flex items-center justify-between gap-2 rounded-lg border px-2 py-1 text-sm tabular-nums',
   {
     variants: {
       state: {
-        free: '',
-        booked: 'bg-muted text-muted-foreground',
-        past: 'border-dashed text-muted-foreground',
+        free: 'border-border',
+        booked: 'border-transparent bg-secondary text-muted-foreground',
+        past: 'border-dashed border-muted-foreground/50 text-muted-foreground',
       },
     },
   },
 )
 
-const toggleClassName = 'aria-pressed:border-foreground aria-pressed:bg-muted'
+// A segmented control: a gray track, the chosen segment a raised thumb (aria-pressed says which).
+const segmentClassName =
+  'pressable h-8 rounded-full px-4 text-sm font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring aria-pressed:bg-card aria-pressed:font-semibold aria-pressed:text-foreground aria-pressed:shadow-sm dark:aria-pressed:bg-popover'
 
 type OwnerScheduleProps = {
   businessId: number
@@ -84,7 +86,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
       return (
         <div className="flex flex-col gap-2">
           {Array.from({ length: 4 }, (_, i) => (
-            <Skeleton key={i} className="h-14" />
+            <Skeleton key={i} className="h-14 rounded-2xl" />
           ))}
         </div>
       )
@@ -100,7 +102,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
 
     if (days.every((day) => slotsOn(day).length === 0)) {
       return (
-        <p className="text-muted-foreground">
+        <p className="rounded-2xl bg-card p-4 text-muted-foreground">
           {mode === 'day' ? 'No time slots on this day.' : 'No time slots in this week.'} Publish some above.
         </p>
       )
@@ -108,7 +110,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
 
     if (mode === 'day') {
       return (
-        <ul className="divide-y rounded-lg border">
+        <ul className="divide-y divide-border/70 overflow-hidden rounded-2xl bg-card">
           {slotsOn(date).map((slot) => {
             const state = stateOf(slot)
             const time = slot.startsAt.slice(11, 16)
@@ -148,7 +150,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
           const free = daySlots.filter((s) => stateOf(s) === 'free').length
           const booked = daySlots.filter((s) => s.status === 'booked').length
           return (
-            <li key={day} className="flex min-w-0 flex-col gap-2 rounded-lg border p-3 lg:p-2">
+            <li key={day} className="flex min-w-0 flex-col gap-2 rounded-2xl bg-card p-3 lg:p-2">
               <button
                 type="button"
                 onClick={() => {
@@ -156,14 +158,16 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
                   setMode('day')
                 }}
                 aria-label={`${formatDay(day)}: ${free} free, ${booked} booked. Open day`}
-                className="flex flex-col items-start rounded-sm text-left outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring"
+                className="pressable flex flex-col items-start rounded-lg p-1 text-left outline-none hover:bg-secondary focus-visible:ring-3 focus-visible:ring-ring"
               >
                 <span className="font-semibold tabular-nums">{formatDay(day)}</span>
                 <span className="text-xs text-muted-foreground tabular-nums">
                   {free} free · {booked} booked
                 </span>
                 {/* Every header has this line, empty on other days, so the columns stay level. */}
-                <span className="min-h-4 text-xs font-semibold">{day === today ? 'Today' : ''}</span>
+                <span className="min-h-4 text-xs font-semibold text-tint">
+                  {day === today ? 'Today' : ''}
+                </span>
               </button>
               {daySlots.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No slots</p>
@@ -194,18 +198,17 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
           Schedule
         </h2>
         <div className="flex flex-wrap items-center gap-2">
-          <div role="group" aria-label="View" className="flex gap-2">
+          <div role="group" aria-label="View" className="flex gap-1 rounded-full bg-secondary p-1">
             {(['day', 'week'] as const).map((m) => (
-              <Button
+              <button
                 key={m}
-                variant="outline"
-                size="sm"
+                type="button"
                 aria-pressed={mode === m}
                 onClick={() => setMode(m)}
-                className={toggleClassName}
+                className={segmentClassName}
               >
                 {m === 'day' ? 'Day' : 'Week'}
-              </Button>
+              </button>
             ))}
           </div>
           <Button
@@ -219,7 +222,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 rounded-full bg-card p-1">
         <Button
           variant="outline"
           size="icon"
@@ -228,7 +231,7 @@ export function OwnerSchedule({ businessId, date, onDateChange }: OwnerScheduleP
         >
           <ChevronLeft aria-hidden />
         </Button>
-        <p aria-live="polite" className="font-semibold tabular-nums">
+        <p aria-live="polite" className="text-center font-semibold tabular-nums">
           {rangeLabel}
         </p>
         <Button

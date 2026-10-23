@@ -16,7 +16,7 @@ export function BusinessPhotoPreview({ imageUrl, category, onError }: BusinessPh
 
   if (!imageUrl || failed) {
     return (
-      <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-lg bg-muted text-muted-foreground">
+      <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-xl bg-muted text-muted-foreground">
         <Icon aria-hidden className="size-12" />
         <span className="text-sm">{failed ? 'This photo could not be loaded' : 'No photo'}</span>
       </div>
@@ -31,7 +31,7 @@ export function BusinessPhotoPreview({ imageUrl, category, onError }: BusinessPh
         setFailed(true)
         onError?.()
       }}
-      className="aspect-video w-full rounded-lg bg-muted object-cover"
+      className="aspect-video w-full rounded-xl bg-muted object-cover"
     />
   )
 }

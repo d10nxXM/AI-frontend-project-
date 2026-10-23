@@ -30,10 +30,10 @@ export function BusinessProfileForm({ id }: BusinessProfileFormProps) {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="flex flex-col gap-4">
           {Array.from({ length: 5 }, (_, i) => (
-            <Skeleton key={i} className="h-16" />
+            <Skeleton key={i} className="h-16 rounded-2xl" />
           ))}
         </div>
-        <Skeleton className="aspect-video w-full" />
+        <Skeleton className="aspect-video w-full rounded-2xl" />
       </div>
     )
   }
@@ -132,7 +132,7 @@ function ProfileFields({ business }: ProfileFieldsProps) {
       onSubmit={save}
       className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
     >
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 rounded-2xl bg-card p-4 md:p-6">
         <div className="flex flex-col items-start gap-2">
           <span className="text-sm font-medium">Category</span>
           <Badge variant="secondary">{categoryLabels[business.category]}</Badge>
@@ -189,7 +189,7 @@ function ProfileFields({ business }: ProfileFieldsProps) {
       </div>
 
       {/* On phones right under the photo link, before Save; from lg up a sticky side column. */}
-      <div className="flex flex-col gap-2 lg:sticky lg:top-8 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+      <div className="flex flex-col gap-2 rounded-2xl bg-card p-4 lg:sticky lg:top-20 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
         <span className="text-sm font-medium">Preview</span>
         <BusinessPhotoPreview
           key={previewUrl}

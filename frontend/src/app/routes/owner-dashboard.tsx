@@ -10,7 +10,7 @@ export function OwnerDashboard() {
   return (
     <section className="flex flex-col gap-6">
       <title>Dashboard · Zakazi.me</title>
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <h1 className="text-3xl leading-tight font-bold md:text-4xl">Dashboard</h1>
       <OwnerBookings businessId={OWNER_BUSINESS_ID} onCancelled={(booking) => releaseRange.mutate(booking)} />
     </section>
   )
